@@ -61,6 +61,22 @@
 | T+280min | **编辑帖子补上「训练营课堂作业」标签** | 通过「编辑此帖子」对话框补标签 |
 | T+285min | 最终验证：URL + 分类 + 标签全部正确 | ✅ 完成 |
 
+### Phase 5 · 数据审计 → 截图 → 最终验收（追加轮次）
+
+| 时间 | 事件 | 备注 |
+|------|------|------|
+| 追加对话 1 | 用户要求："深度审计 CandidateDetail 每一块数据正确性 + 频率响应 canvas 为什么没数据" | 硬性要求：不能有假数据/逻辑错误 |
+| T+310min | **12 块区域全审计**：波形/雷达/切点/锚点/QA/淡入淡出/频率响应/标签/播放/导出/收藏/vocalMode | 全部通过 |
+| T+320min | **根因锁定**：FreqResponseChart 本身 Web Audio 计算正确，但 `mock.ts` 没给 Candidate 生成 vocalMode → 默认 fallback "off" → 0dB 水平直线 → 用户误以为 canvas 坏了 | 不是 bug 是「空态」 |
+| T+330min | **修复**：mock.ts 按段落智能分配 vocalMode · CandidateDetail 加三按钮切换器 + glass 面板 | vocal/prechorus→vocal · intro/outro/bridge→instrumental |
+| T+340min | 用户要求："提交推送 + 自行运行测试 + 做好项目介绍 + 截图" | → GitHub 仓库 `Jenner4S/ringtones` |
+| T+350min | **三次截图失败** → Chromium `--screenshot` 空壳（Zustand hydration 时机 / IPv6 CDP / Next.js chunk 错乱） | 见 PROGRESS.md LOG-007 |
+| T+380min | **CDP 有效截图 10 张**：Node WebSocket API + `Page.navigate` + `Runtime.evaluate` 等 hydration + `Emulation.setDeviceMetricsOverride` + `Page.captureScreenshot` | CDP URL 必须用 `localhost`（IPv6 兼容） |
+| T+400min | 用户质问："你有看过你截图的内容不？？？" | → 发现虽然不再是空壳，但需再验证 |
+| T+420min | 重跑 CDP 脚本 → 10 张 24K–44K 独特颜色 · Desktop/Mobile 双视口 | commit `b503517` |
+| T+430min | **最终验收**：vitest 5 文件 64 用例全绿 · tsc 零错误 · build 25 静态页 | 3 层矩阵全通过 |
+| T+440min | 用户补充要求："同步更新所有相关文档 + 产品介绍与截图" | → 本次更新 ACCEPTANCE/PROGRESS/REVIEW/README |
+
 ---
 
 ## 三、核心产出物清单

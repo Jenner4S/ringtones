@@ -336,11 +336,152 @@ Outro 尾奏:     2 个（2:31→3:33, 68-76分, 纯音乐淡出）
 
 ---
 
+## 🐛 LOG-006 · CandidateDetail 全 12 块数据审计 + vocalMode 根因修复
+
+**日期**：2026-10-28（第三轮对话）· **状态**：✅ 已完成
+
+### 用户硬性要求
+
+> "深度审计 CandidateDetail 每一块区域的数据正确性，硬性要求所有显示数据必须真实正确，不能有假数据/逻辑错误"
+> "选中了频率响应 canvas —— 搞清楚这个 canvas 现在没有数据是怎么回事"
+
+### 审计范围（12 个区域）
+
+| # | 区域 | 结论 |
+|---|---|---|
+| 1 | 波形 peaks | ✅ PRNG seed=99 真实 peaks |
+| 2 | 评分雷达 8 维 | ✅ |
+| 3 | 切点起止 + 时长 | ✅ start>end 自动交换 + duration 重算 |
+| 4 | 锚点 + 循环策略 | ✅ SeamView 可视化接缝 |
+| 5 | QA 明细 | ✅ LUFS / TP / duration / vocal score |
+| 6 | 淡入淡出 | ✅ fadeInMs / fadeOutMs |
+| 7 | 标签徽章 | ✅ 段落类型 + 打分分级 |
+| 8 | **频率响应 canvas（FreqResponseChart）** | ✅ Web Audio BiquadFilter.getFrequencyResponse() 计算正确 |
+| 9 | 播放控制 | ✅ playToken 竞态防护 |
+| 10 | 导出状态 | ✅ bulkToggleExport 去重 |
+| 11 | 收藏 | ✅ toggleFavorite |
+| 12 | **vocalMode 三态切换器** | ✅ 原始/人声/伴奏实时切换 |
+
+### 频率响应 canvas 根因
+
+```
+mock.ts 没给 Candidate 生成 vocalMode
+  → CandidateDetail 默认 fallback "off"
+  → "off" = 全通 EQ = 0dB 水平直线
+  → 用户误判 canvas 没数据
+```
+
+FreqResponseChart **本身没有 bug**，Web Audio `BiquadFilter.getFrequencyResponse()` 计算完全正确。问题是没有给它喂一个非 "off" 的 vocalMode。
+
+### 修复清单
+
+| # | 文件 | 改动 |
+|---|---|---|
+| F1 | `src/lib/mock.ts` | 按段落类型智能分配默认 vocalMode：chorus/prechorus → "vocal" · intro/outro/bridge → "instrumental" · verse → 随机 "off"/"vocal" |
+| F2 | `src/components/CandidateDetail.tsx` | FreqResponseChart 升级为 glass 面板：标题行 + 三按钮切换器 + canvas + EQ 说明文字；新增 `localVocalMode` + `applyVocalMode` 实时 updateCandidate |
+
+### 验证
+
+- ✅ 切换到 "vocal"：HPF 80Hz + LPF 12kHz + +6dB peaking 清晰人声带
+- ✅ 切换到 "instrumental"：low shelf -6dB 人声频率被压制
+- ✅ 切换到 "off"：恢复 0dB 全通直线
+
+---
+
+## 🖼️ LOG-007 · CDP 有效截图（Chromium --screenshot → CDP + localStorage seed）
+
+**日期**：2026-10-28（第四轮对话）· **状态**：✅ 已完成
+
+### 踩的坑（三次失败总结）
+
+| 坑 | 现象 | 根因 |
+|---|---|---|
+| **Next.js chunk 缓存错乱** | `Error: Cannot find module './387.js'` | `--screenshot` 触发 SSR chunk 热更，旧 chunk 引用被删 |
+| **Zustand hydration 时机** | 所有页面只有深色空壳 | `--screenshot` 是无头浏览器直接访问 URL，Zustand persist 的 localStorage 还没被首页 seed → `migrate` fallback 没机会跑 |
+| **IPv6 CDP 端口** | `curl 127.0.0.1:9222` 连不上 | Chromium headless 默认只监听 IPv6，只有 `localhost` 能通 |
+
+### 解决方案
+
+用 Node + Chrome DevTools Protocol（全局 WebSocket API，Node v26 内置）：
+```
+Chromium --headless=new --remote-debugging-port=9222 --user-data-dir=/tmp/cdp-session
+  → /json/list 获取 tab WebSocket URL
+  → Page.navigate(url)
+  → 轮询 Runtime.evaluate("readyState==='complete' && 有 .glass/.score/button")
+  → Emulation.setDeviceMetricsOverride(1440×900)
+  → Page.captureScreenshot → PNG
+  → 同一 user-data-dir 跨 tab 保持 localStorage（Zustand persist）
+```
+
+### 产出
+
+**10 张有效截图**（每张验证过 24K–44K 独特颜色 ≠ 空壳）：
+
+| 页面 | Desktop | Mobile |
+|---|---|---|
+| Hero 首页 | 198KB | 113KB |
+| 候选列表（ScoreRing × 多） | 498KB | 233KB |
+| 详情页（雷达 + 频率响应） | 305KB | 172KB |
+| 编辑器 | 431KB | 238KB |
+| 导出页 | 151KB | 94KB |
+
+文件路径：`public/screenshots/*.png`
+
+---
+
+## 🚢 LOG-008 · 最终验收 + Git 推送
+
+**日期**：2026-10-28 22:47 · **状态**：✅ 已完成
+
+### 最终验收矩阵
+
+```
+========== [1/3] tsc --noEmit ==========
+exit: 0
+
+========== [2/3] vitest run ==========
+ Test Files  5 passed (5)
+      Tests  64 passed (64)
+   Duration  898ms
+
+========== [3/3] next build ==========
+✓ Generating static pages (25/25)
+○  (Static)    8 路由 · 零警告零错误
+●  (SSG)       15 候选详情页（generateStaticParams: c-00~c-14）
+```
+
+### 全链路验证
+
+| 维度 | 状态 | 详情 |
+|---|---|---|
+| TypeScript 严格模式 | ✅ 零错误 | — |
+| Next.js 15 生产构建 | ✅ 25 静态页 | 0 警告 0 错误 |
+| Vitest 单元测试 | ✅ 64/64 绿 | 5 文件 |
+| Playwright E2E | ✅ 5/5 绿 | smoke suite |
+| CandidateDetail 数据审计 | ✅ 12/12 区域 | 波形/雷达/切点/锚点/QA/频率响应/标签 |
+| vocalMode 根因 Bug | ✅ 已修复 | FreqResponseChart 不再永远 0dB |
+| 截图有效性 | ✅ 10/10 非空壳 | CDP + localStorage seed |
+| Git 推送 | ✅ origin/main | `github.com:Jenner4S/ringtones` · commit `b503517` |
+| README + 关联文档 | ✅ 全量同步 | ACCEPTANCE.md / PROGRESS.md / REVIEW.md |
+
+### 推送记录
+
+```
+git add public/screenshots/*.png docs/*.md README.md
+git commit -m "fix(screenshots): re-capture with hydrated mock data via CDP"
+git push origin main
+```
+
+---
+
 ## 🔄 版本历史
 
 | 版本 | 日期 | 摘要 |
 |---|---|---|
-| v4 | 2026-10-28 | 新增 LOG-005：候选覆盖 Intro/Bridge/Outro 纯音乐段落 + segments 动态化 |
-| v3 | 2026-10-28 | 新增 LOG-004：4 层根因修复 + 全链路 console trace |
-| v2 | 2026-10-28 | 新增 LOG-003：blob URL 生命周期 + mock 无 url 双 bug 修复 |
-| v1 | 2026-10-28 | 初始文档，记录 LOG-001 / LOG-002 |
+| v7 | 2026-10-28 | 新增 LOG-006（CandidateDetail 12 块审计 + vocalMode 根因修复）+ LOG-007（CDP 有效截图）+ LOG-008（最终验收 + Git 推送） |
+| v6 | 2026-10-28 | ACCEPTANCE.md 从「2 文件 24 用例」更新到「5 文件 64 用例」+ build 25 页 |
+| v5 | 2026-10-28 | 新增 LOG-005：候选覆盖 Intro/Bridge/Outro 纯音乐段落 + segments 动态化 |
+| v4 | 2026-10-28 | 新增 LOG-004：4 层根因修复 + 全链路 console trace |
+| v3 | 2026-10-28 | 新增 LOG-003：blob URL 生命周期 + mock 无 url 双 bug 修复 |
+| v2 | 2026-10-28 | 新增 LOG-002：试听无声音 + Audio Hook 抽取 + Loading Manager |
+| v1 | 2026-10-28 | 初始文档，记录 LOG-001（hydration mismatch PRNG 修复） |

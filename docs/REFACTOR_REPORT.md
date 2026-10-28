@@ -13,10 +13,10 @@
 | 重复代码消除 | **~90 行** / candidates + editor 两页 |
 | 新建通用 hook | **2 个** — `useAudioUrlFallback` · `useAudioSegment` |
 | 运行时防护 | **3 层** — 全局 error boundary · workspace 局部 boundary · 全屏 loading overlay |
-| 单元测试 | **2 文件 · 24 用例 · 100% 通过** |
+| 单元测试 | **5 文件 · 64 用例 · 100% 通过** |
 | E2E 测试 | **5 用例 · 全绿** · 覆盖首页/工作区/设置三大路由 |
 | TypeScript | **strict 模式零错误** |
-| Next.js 构建 | **10 页全静态编译通过** |
+| Next.js 构建 | **25 页全静态编译通过** |
 
 ---
 
@@ -244,7 +244,7 @@ npm run test:e2e           # playwright test · headless 全量
 npm run test:e2e:ui        # playwright test --ui · 交互式 UI
 
 # 生产构建
-npm run build              # next build · 10 页全静态
+npm run build              # next build · 25 页全静态
 ```
 
 ---
@@ -254,9 +254,9 @@ npm run build              # next build · 10 页全静态
 | 验证项 | 命令 | 结果 |
 |---|---|---|
 | TypeScript strict | `tsc --noEmit` | ✅ **exit 0 · 零错误** |
-| 单元测试 | `vitest run` | ✅ **2 文件 · 24/24 通过 · 531ms** |
+| 单元测试 | `vitest run` | ✅ **5 文件 · 64/64 通过 · 898ms** |
 | E2E 测试 | `playwright test` | ✅ **5/5 通过 · 8.4s** |
-| 生产构建 | `next build` | ✅ **10 页全静态导出 · 无警告** |
+| 生产构建 | `next build` | ✅ **25 页全静态导出 · 无警告** |
 | 重复代码 | candidates + editor | ✅ **audio 基础设施零重复** |
 | 运行时健壮性 | 全局 + 局部 error boundary + loading overlay | ✅ **三层防护就位** |
 

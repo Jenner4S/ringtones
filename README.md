@@ -137,12 +137,14 @@ npm run build
 ```
 Test Files  5 passed (5)
      Tests  64 passed (64)
-  Duration  964ms
+  Duration  898ms
+
+✓ Generating static pages (25/25)
 
 Routes (app)              Size  First Load JS
 ○  /                      14.9 kB        169 kB
 ○  /workspace/candidates   7.35 kB        156 kB
-●  /workspace/candidates/[id]  6.12 kB  155 kB  (SSG ×12)
+●  /workspace/candidates/[id]  6.12 kB  155 kB  (SSG ×15: c-00~c-14)
 ○  /workspace/editor       4.95 kB        154 kB
 ○  /workspace/export       6.23 kB        150 kB
 ```

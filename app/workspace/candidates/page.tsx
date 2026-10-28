@@ -97,10 +97,10 @@ export default function CandidatesPage() {
 
   return (
     <>
-      <div className="grid grid-cols-1 gap-3 lg:gap-4 xl:grid-cols-[200px_minmax(0,1fr)_320px] 2xl:grid-cols-[220px_minmax(0,1fr)_360px]">
+      <div className="grid grid-cols-1 gap-2 sm:gap-3 lg:gap-4 xl:grid-cols-[200px_minmax(0,1fr)_320px] 2xl:grid-cols-[220px_minmax(0,1fr)_360px]">
       <SegmentNav />
 
-      <div className="min-w-0 flex flex-col gap-4">
+      <div className="min-w-0 flex flex-col gap-2 sm:gap-3 lg:gap-4">
         <Toolbar
           filter={filter}
           setFilter={setFilter}
@@ -130,7 +130,7 @@ export default function CandidatesPage() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-1.5 sm:gap-2 lg:gap-3">
+        <div className="flex flex-col gap-1 sm:gap-2 lg:gap-3">
           <AnimatePresence initial={false}>
             {filtered.map((c, i) => {
               const selected = c.id === selectedId;

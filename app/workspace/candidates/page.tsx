@@ -44,7 +44,7 @@ export default function CandidatesPage() {
 
   useAudioUrlFallback(project, setProject);
 
-  const { audioRef, playhead, playTokenRef, safePlay, safePause, seekTo } = useAudioSegment({
+  const { audioRef, playhead, safePlay, safePause, seekTo } = useAudioSegment({
     url: project?.file?.url,
     showToast,
     onTimeUpdate: (t) => {
@@ -68,7 +68,6 @@ export default function CandidatesPage() {
       showToast("error", "音频未就绪");
       return;
     }
-    const token = ++playTokenRef.current;
     if (playingId === candidate.id) {
       const audio = audioRef.current;
       if (!audio) return;
@@ -86,8 +85,7 @@ export default function CandidatesPage() {
     safePlay((audio) => {
       audio.currentTime = candidate.start;
     }).then((ok) => {
-      if (ok && playTokenRef.current === token) setPlayingId(candidate.id);
-      else if (playTokenRef.current === token) setPlayingId(null);
+      if (ok) setPlayingId(candidate.id);
     });
   };
 

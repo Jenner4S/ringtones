@@ -122,35 +122,6 @@ export function CandidateDetail({
           <Badge variant={candidate.loopQuality >= 0.85 ? "green" : "red"} dot>
             循环 {(candidate.loopQuality * 100).toFixed(0)}%
           </Badge>
-
-          <div className="ml-auto flex items-center gap-1">
-            {[
-              { k: "off", label: "原始" },
-              { k: "vocal", label: "人声" },
-              { k: "instrumental", label: "伴奏" },
-            ].map((m) => {
-              const vm = candidate.vocalMode ?? "off";
-              const active = vm === m.k;
-              return (
-                <button
-                  key={m.k}
-                  onClick={() => {
-                    const next = (active ? "off" : m.k) as any;
-                    updateCandidate(candidate.id, { vocalMode: next });
-                    showToast("info", next === "off" ? "已恢复原始声像" : next === "vocal" ? "已切换为 · 人声聚焦" : "已切换为 · 伴奏纯净");
-                  }}
-                  className={cn(
-                    "rounded-[8px] px-2.5 py-1 text-[11px] transition",
-                    active
-                      ? "bg-[rgba(0,229,255,0.14)] text-[var(--accent-cyan)] ring-1 ring-[rgba(0,229,255,0.35)]"
-                      : "text-dim hover:text-1 hover:bg-[var(--bg-3)]"
-                  )}
-                >
-                  {m.label}
-                </button>
-              );
-            })}
-          </div>
         </div>
       </div>
 

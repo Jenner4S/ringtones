@@ -77,11 +77,34 @@ export default function SettingsPage() {
           <Row title="ASR 歌词识别（实验）">
             <Toggle value={settings.useAsr} onChange={(v) => update({ useAsr: v })} />
           </Row>
+          <Row title="声像处理">
+            <div className="flex flex-wrap gap-1.5">
+              {[
+                { k: "off", label: "原始", hint: "保留全频段" },
+                { k: "vocal", label: "人声聚焦", hint: "提取纯净人声" },
+                { k: "instrumental", label: "伴奏纯净", hint: "去除人声" },
+              ].map((m) => (
+                <button
+                  key={m.k}
+                  onClick={() => update({ vocalMode: m.k as any })}
+                  title={m.hint}
+                  className={
+                    "rounded-[8px] glass px-3 py-1.5 text-[12px] transition " +
+                    (settings.vocalMode === m.k
+                      ? "bg-[rgba(0,229,255,0.14)] text-[var(--accent-cyan)] ring-1 ring-[rgba(0,229,255,0.4)]"
+                      : "text-muted hover:text-1 hover:bg-[var(--bg-3)]")
+                  }
+                >
+                  {m.label}
+                </button>
+              ))}
+            </div>
+          </Row>
         </GroupCard>
 
         <GroupCard title="时长与响度">
           <Row title="最大时长">
-            <div className="w-[320px]">
+            <div className="w-full max-w-full max-w-[320px]">
               <ParamSlider
                 label="最大时长"
                 unit="s"
@@ -94,7 +117,7 @@ export default function SettingsPage() {
             </div>
           </Row>
           <Row title="目标响度 (LUFS)">
-            <div className="w-[320px]">
+            <div className="w-full max-w-full max-w-[320px]">
               <ParamSlider
                 label="目标响度"
                 unit=" LUFS"
@@ -110,7 +133,7 @@ export default function SettingsPage() {
 
         <GroupCard title="默认参数">
           <Row title="默认淡入">
-            <div className="w-[320px]">
+            <div className="w-full max-w-[320px]">
               <ParamSlider
                 label="淡入"
                 unit="ms"
@@ -123,7 +146,7 @@ export default function SettingsPage() {
             </div>
           </Row>
           <Row title="默认淡出">
-            <div className="w-[320px]">
+            <div className="w-full max-w-[320px]">
               <ParamSlider
                 label="淡出"
                 unit="ms"
@@ -162,7 +185,7 @@ export default function SettingsPage() {
         </GroupCard>
 
         <GroupCard title="快捷键">
-          <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-[12px] text-muted">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-[12px] text-muted">
             {[
               ["播放/暂停", "Space"],
               ["微调 10ms", "← →"],

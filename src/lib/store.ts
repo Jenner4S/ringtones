@@ -89,6 +89,7 @@ export const useStore = create<StoreState>()(
         candidateCount: "auto",
         useGpu: true,
         useAsr: false,
+        vocalMode: "off",
       },
       updateSettings: (patch) =>
         set((s) => ({ settings: { ...s.settings, ...patch } })),

@@ -43,11 +43,11 @@ export default function WorkspaceLayout({ children }: { children: React.ReactNod
   return (
     <AppShell>
       <Toast />
-      <div className="mb-6 flex flex-col gap-4">
-        <div className="flex items-center justify-between gap-3 flex-wrap">
-          <div className="flex items-center gap-3 min-w-0">
+      <div className="mb-4 lg:mb-6 flex flex-col gap-3 lg:gap-4">
+        <div className="flex items-center justify-between gap-2 sm:gap-3 flex-wrap">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             <div className="min-w-0">
-              <h1 className="font-display text-[22px] font-semibold leading-tight truncate">{project.name}</h1>
+              <h1 className="font-display text-[18px] sm:text-[22px] font-semibold leading-tight truncate">{project.name}</h1>
               <div className="mt-1 text-[12px] text-dim num-mono">
                 {project.analysis?.bpm} BPM · {project.file.duration.toFixed(1)}s · {project.candidates.length} 候选
               </div>

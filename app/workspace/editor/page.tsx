@@ -241,11 +241,11 @@ export default function EditorPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 lg:gap-4 xl:grid-cols-2">
         <div className="glass rounded-[14px] p-4 shadow-card">
           <div className="mb-4 text-[12px] text-muted font-medium">参数</div>
 
-          <div className="grid grid-cols-2 gap-4 mb-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
             <div>
               <div className="text-[11px] text-dim mb-1">入点 / 出点</div>
               <div className="num-mono text-[13px]">
@@ -271,7 +271,7 @@ export default function EditorPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 mb-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
             <ParamSlider label="淡入" unit="ms" value={fadeIn} min={30} max={300} step={10} onChange={setFadeIn} />
             <ParamSlider label="淡出" unit="ms" value={fadeOut} min={200} max={1500} step={50} onChange={setFadeOut} />
           </div>
@@ -301,7 +301,7 @@ export default function EditorPage() {
             <FadeCurve inMs={fadeIn} outMs={fadeOut} totalMs={Math.max(100, duration * 1000)} />
           </div>
 
-          <div className="mt-4 grid grid-cols-2 gap-2">
+          <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
             <button
               onClick={() => {
                 setFadeIn(agent.agentFadeInMs);

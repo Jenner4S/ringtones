@@ -130,6 +130,8 @@ export interface Project {
   exported: Candidate[];
 }
 
+export type VocalMode = "off" | "vocal" | "instrumental";
+
 export interface AppSettings {
   theme: "dark" | "light";
   language: "zh-CN" | "en";
@@ -141,4 +143,5 @@ export interface AppSettings {
   candidateCount: "auto" | number;
   useGpu: boolean;
   useAsr: boolean;
+  vocalMode: VocalMode;
 }

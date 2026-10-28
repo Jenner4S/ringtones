@@ -97,7 +97,7 @@ export default function CandidatesPage() {
 
   return (
     <>
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-[240px_minmax(0,1fr)_360px]">
+      <div className="grid grid-cols-1 gap-3 lg:gap-4 xl:grid-cols-[200px_minmax(0,1fr)_320px] 2xl:grid-cols-[220px_minmax(0,1fr)_360px]">
       <SegmentNav />
 
       <div className="min-w-0 flex flex-col gap-4">
@@ -284,7 +284,7 @@ function SegmentNav() {
   filtered.forEach((c) => bySegment.set(c.segment, (bySegment.get(c.segment) ?? 0) + 1));
 
   return (
-    <div className="glass rounded-[14px] p-3 h-fit">
+    <div className="glass rounded-[14px] p-3 h-fit hidden xl:block sticky top-[80px]">
       <div className="flex items-center gap-2 mb-3">
         <Columns className="h-3.5 w-3.5 text-[var(--accent-cyan)]" />
         <div className="text-[12px] font-medium text-1">结构导航</div>
@@ -456,7 +456,7 @@ function DetailPanel({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <ParamSlider
           label="淡入"
           unit="ms"

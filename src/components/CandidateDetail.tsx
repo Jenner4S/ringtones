@@ -141,38 +141,6 @@ export function CandidateDetail({
       </div>
 
       <div className="glass rounded-[12px] sm:rounded-[14px] p-3 sm:p-4">
-        <div className="text-[11px] text-dim mb-3">声像处理</div>
-        <div className="flex items-center gap-2">
-          {[
-            { k: "off", label: "原始" },
-            { k: "vocal", label: "人声聚焦" },
-            { k: "instrumental", label: "伴奏纯净" },
-          ].map((m) => {
-            const vm = candidate.vocalMode ?? "off";
-            const active = vm === m.k;
-            return (
-              <button
-                key={m.k}
-                onClick={() => {
-                  const next = (active ? "off" : m.k) as any;
-                  updateCandidate(candidate.id, { vocalMode: next });
-                  showToast("info", next === "off" ? "已恢复原始声像" : next === "vocal" ? "已切换为 · 人声聚焦" : "已切换为 · 伴奏纯净");
-                }}
-                className={cn(
-                  "flex-1 rounded-[8px] px-3 py-2 text-[12px] transition",
-                  active
-                    ? "bg-[rgba(0,229,255,0.14)] text-[var(--accent-cyan)] ring-1 ring-[rgba(0,229,255,0.35)]"
-                    : "text-muted hover:text-1 hover:bg-[var(--bg-3)]"
-                )}
-              >
-                {m.label}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="glass rounded-[12px] sm:rounded-[14px] p-3 sm:p-4">
         <div className="text-[11px] text-dim mb-3">参数微调</div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <ParamSlider

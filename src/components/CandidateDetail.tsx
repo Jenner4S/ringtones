@@ -38,11 +38,20 @@ export function CandidateDetail({
 
   const audioRef = useRef<HTMLAudioElement>(null);
   const [playing, setPlaying] = useState(false);
+  const [localVocalMode, setLocalVocalMode] = useState<VocalMode>((candidate.vocalMode ?? "off") as VocalMode);
 
   const audioUrl = project?.file?.url ?? "";
-  const vocalMode = (candidate.vocalMode ?? "off") as VocalMode;
 
-  const { resumeAndApply } = useAudioPipeline(audioRef, vocalMode);
+  const { resumeAndApply } = useAudioPipeline(audioRef, localVocalMode);
+
+  const applyVocalMode = (m: VocalMode) => {
+    setLocalVocalMode(m);
+    updateCandidate(candidate.id, { vocalMode: m });
+    const audio = audioRef.current;
+    if (audio && !audio.paused) {
+      resumeAndApply();
+    }
+  };
 
   const togglePlay = () => {
     const audio = audioRef.current;
@@ -118,8 +127,37 @@ export function CandidateDetail({
           </div>
         </div>
 
-        <div className="mb-2">
-          <FreqResponseChart mode={vocalMode} height={100} />
+        <div className="glass rounded-[12px] sm:rounded-[14px] p-3 sm:p-4">
+          <div className="flex items-center justify-between mb-2">
+            <div className="text-[11px] text-dim">频率响应</div>
+            <div className="flex items-center gap-0.5 rounded-full border border-app bg-[var(--bg-2)] p-0.5">
+              {([
+                { k: "off", label: "原始" },
+                { k: "vocal", label: "人声" },
+                { k: "instrumental", label: "伴奏" },
+              ] as const).map(({ k, label }) => (
+                <button
+                  key={k}
+                  onClick={() => applyVocalMode(k)}
+                  className={`rounded-full px-2.5 sm:px-3 py-1 text-[10px] sm:text-[11px] transition ${
+                    localVocalMode === k
+                      ? "grad-primary text-[var(--bg-0)] font-medium shadow-sm"
+                      : "text-dim hover:text-muted"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="h-[90px] sm:h-[100px]">
+            <FreqResponseChart mode={localVocalMode} height={100} />
+          </div>
+          <div className="mt-1.5 text-[10px] text-dim num-mono">
+            {localVocalMode === "off" && "原始声像 · 无 EQ 处理"}
+            {localVocalMode === "vocal" && "人声聚焦 · HPF 200Hz + 3kHz +6dB 峰值"}
+            {localVocalMode === "instrumental" && "伴奏纯净 · 1.2kHz -14dB 切人声"}
+          </div>
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">

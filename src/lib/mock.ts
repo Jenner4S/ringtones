@@ -1,4 +1,5 @@
 import type { AnalysisResult, Candidate, Project, Stage } from "./types";
+import type { VocalMode } from "./types";
 
 function buildStages(): Stage[] {
   return [
@@ -201,6 +202,11 @@ export function buildMockCandidates(analysis: AnalysisResult): Candidate[] {
     const fadeInMs = 60 + Math.round(rand() * 80);
     const fadeOutMs = 600 + Math.round(rand() * 400);
 
+    const vocalMode: VocalMode =
+      p.kind === "chorus" || p.kind === "prechorus" ? "vocal" :
+      p.kind === "intro" || p.kind === "outro" || p.kind === "bridge" ? "instrumental" :
+      rand() > 0.55 ? "off" : "vocal";
+
     out.push({
       id: `c-${String(idx).padStart(2, "0")}`,
       index: idx,
@@ -222,6 +228,7 @@ export function buildMockCandidates(analysis: AnalysisResult): Candidate[] {
       segment: p.label,
       reason,
       relaxed: !pass && score > 45,
+      vocalMode,
       qa: {
         status: pass ? "pass" : score > 45 ? "pending" : "fail",
         reasons: pass

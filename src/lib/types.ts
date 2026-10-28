@@ -65,6 +65,8 @@ export interface ScoreBreakdown {
   technical: number;
 }
 
+export type VocalMode = "off" | "vocal" | "instrumental";
+
 export interface Candidate {
   id: string;
   index: number;
@@ -87,6 +89,7 @@ export interface Candidate {
   reason: string;
   relaxed: boolean;
   qa: QaResult;
+  vocalMode?: VocalMode;
 }
 
 export interface AnalysisResult {
@@ -129,8 +132,6 @@ export interface Project {
   selectedCandidateId?: string;
   exported: Candidate[];
 }
-
-export type VocalMode = "off" | "vocal" | "instrumental";
 
 export interface AppSettings {
   theme: "dark" | "light";

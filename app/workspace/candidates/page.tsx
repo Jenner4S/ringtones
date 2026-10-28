@@ -44,27 +44,21 @@ export default function CandidatesPage() {
 
   useAudioUrlFallback(project, setProject);
 
-  const { audioRef, playhead, playTokenRef, safePlay, safePause } = useAudioSegment({
+  const { audioRef, playhead, playTokenRef, safePlay, safePause, seekTo } = useAudioSegment({
     url: project?.file?.url,
     showToast,
     onTimeUpdate: (t) => {
       const r = activeRangeRef.current;
       if (r && t >= r.end) {
-        const audio = audioRef.current;
-        if (audio) {
-          audio.currentTime = r.start;
-          void audio.play();
-        }
+        seekTo(r.start);
+        void safePlay();
       }
     },
     onEnded: () => {
       const r = activeRangeRef.current;
       if (r) {
-        const audio = audioRef.current;
-        if (audio) {
-          audio.currentTime = r.start;
-          void audio.play();
-        }
+        seekTo(r.start);
+        void safePlay();
       }
     },
   });
@@ -78,9 +72,13 @@ export default function CandidatesPage() {
     if (playingId === candidate.id) {
       const audio = audioRef.current;
       if (!audio) return;
-      if (audio.paused) void safePlay();
-      else safePause();
-      setPlayingId(audio.paused ? null : candidate.id);
+      if (audio.paused) {
+        void safePlay();
+        setPlayingId(candidate.id);
+      } else {
+        safePause();
+        setPlayingId(null);
+      }
       return;
     }
     safePause();

@@ -47,21 +47,21 @@ export default function WorkspaceLayout({ children }: { children: React.ReactNod
       <div className="mb-2 sm:mb-4 lg:mb-6 flex flex-col gap-1.5 sm:gap-3 lg:gap-4">
         <div className="flex items-center gap-1 sm:gap-3">
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-1 sm:gap-2 min-w-0">
-              <h1 className="font-display text-[14px] sm:text-[22px] font-semibold leading-tight truncate min-w-0 flex-1">{project.name}</h1>
-              <button
-                onClick={onDelete}
-                className="flex-shrink-0 h-6 w-6 sm:h-7 sm:w-7 flex items-center justify-center rounded-md text-dim hover:text-[var(--accent-red)] hover:bg-[var(--accent-red)]/10 transition"
-                title="删除此项目"
-              >
-                <Trash2 className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-              </button>
-            </div>
+            <h1 className="font-display text-[14px] sm:text-[22px] font-semibold leading-tight truncate">{project.name}</h1>
             <div className="mt-0.5 text-[9px] sm:text-[12px] text-dim num-mono truncate">
               {project.analysis?.bpm}BPM·{project.file.duration.toFixed(0)}s·{project.candidates.length}♪
             </div>
           </div>
-          <nav className="flex items-center gap-0.5 glass rounded-[10px] sm:rounded-[12px] p-1 sm:p-1.5 shrink-0">
+          <div className="flex items-center gap-0.5 sm:gap-1 glass rounded-[10px] sm:rounded-[12px] p-0.5 sm:p-1 shrink-0">
+            <button
+              onClick={onDelete}
+              aria-label="删除此项目"
+              title="删除此项目"
+              className="flex items-center rounded-[8px] sm:rounded-[10px] px-1.5 sm:px-2 py-1.5 sm:py-1.5 text-dim hover:text-[var(--accent-red)] hover:bg-[var(--accent-red)]/10 transition"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </button>
+            <div className="mx-0.5 h-4 w-px bg-[var(--border-strong)]/60" />
             {STAGES.map((s) => {
               const active = pathname?.startsWith(s.href);
               return (
@@ -71,19 +71,19 @@ export default function WorkspaceLayout({ children }: { children: React.ReactNod
                   aria-label={s.label}
                   aria-current={active ? "page" : undefined}
                   className={
-                    "relative flex items-center rounded-[8px] sm:rounded-[10px] " +
+                    "flex items-center rounded-[8px] sm:rounded-[10px] " +
                     "px-2 sm:px-3 py-1.5 sm:py-1.5 text-[10px] sm:text-[12px] transition " +
                     (active
                       ? "bg-[var(--accent-cyan)]/15 text-[var(--accent-cyan)]"
                       : "text-muted hover:text-1 hover:bg-[var(--bg-3)]")
                   }
                 >
-                  <s.icon className="h-3.5 w-3.5 sm:h-3.5 sm:w-3.5" strokeWidth={active ? 2.4 : 2} />
+                  <s.icon className="h-3.5 w-3.5" strokeWidth={active ? 2.4 : 2} />
                   <span className="hidden sm:inline ml-1.5 sm:ml-2">{s.label}</span>
                 </Link>
               );
             })}
-          </nav>
+          </div>
         </div>
         <StageIndicator stages={project.stages} />
       </div>

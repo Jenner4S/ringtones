@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useStore } from "@/lib/store";
 import { AppShell } from "@/components/AppShell";
 import { Toast } from "@/components/Toast";
@@ -17,6 +17,7 @@ const STAGES = [
 
 export default function WorkspaceLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const pathname = usePathname();
   const project = useStore((s) => s.currentProject);
   const setProject = useStore((s) => s.setProject);
   const removeProject = useStore((s) => s.removeProject);
@@ -50,31 +51,38 @@ export default function WorkspaceLayout({ children }: { children: React.ReactNod
               <h1 className="font-display text-[14px] sm:text-[22px] font-semibold leading-tight truncate min-w-0 flex-1">{project.name}</h1>
               <button
                 onClick={onDelete}
-                className="flex-shrink-0 h-5 w-5 sm:h-7 sm:w-7 flex items-center justify-center rounded-md text-dim hover:text-[var(--accent-red)] hover:bg-[var(--accent-red)]/10 transition"
+                className="flex-shrink-0 h-6 w-6 sm:h-7 sm:w-7 flex items-center justify-center rounded-md text-dim hover:text-[var(--accent-red)] hover:bg-[var(--accent-red)]/10 transition"
                 title="删除此项目"
               >
-                <Trash2 className="h-2.5 w-2.5 sm:h-3.5 sm:w-3.5" />
+                <Trash2 className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
               </button>
             </div>
             <div className="mt-0.5 text-[9px] sm:text-[12px] text-dim num-mono truncate">
               {project.analysis?.bpm}BPM·{project.file.duration.toFixed(0)}s·{project.candidates.length}♪
             </div>
           </div>
-          <nav className="flex items-center gap-0.5 glass rounded-[8px] sm:rounded-[12px] p-0.5 sm:p-1 shrink-0">
-            {STAGES.map((s, i) => (
-              <Link
-                key={s.key}
-                href={s.href}
-                aria-label={s.label}
-                className={
-                  "flex items-center rounded-[6px] sm:rounded-[10px] px-1 sm:px-3 py-0.5 sm:py-1.5 text-[10px] sm:text-[12px] transition " +
-                  "hover:text-1 hover:bg-[var(--bg-3)] text-muted"
-                }
-              >
-                <s.icon className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-                <span className="hidden sm:inline ml-1 sm:ml-2">{s.label}</span>
-              </Link>
-            ))}
+          <nav className="flex items-center gap-0.5 glass rounded-[10px] sm:rounded-[12px] p-1 sm:p-1.5 shrink-0">
+            {STAGES.map((s) => {
+              const active = pathname?.startsWith(s.href);
+              return (
+                <Link
+                  key={s.key}
+                  href={s.href}
+                  aria-label={s.label}
+                  aria-current={active ? "page" : undefined}
+                  className={
+                    "relative flex items-center rounded-[8px] sm:rounded-[10px] " +
+                    "px-2 sm:px-3 py-1.5 sm:py-1.5 text-[10px] sm:text-[12px] transition " +
+                    (active
+                      ? "bg-[var(--accent-cyan)]/15 text-[var(--accent-cyan)]"
+                      : "text-muted hover:text-1 hover:bg-[var(--bg-3)]")
+                  }
+                >
+                  <s.icon className="h-3.5 w-3.5 sm:h-3.5 sm:w-3.5" strokeWidth={active ? 2.4 : 2} />
+                  <span className="hidden sm:inline ml-1.5 sm:ml-2">{s.label}</span>
+                </Link>
+              );
+            })}
           </nav>
         </div>
         <StageIndicator stages={project.stages} />

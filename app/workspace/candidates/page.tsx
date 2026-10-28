@@ -172,6 +172,36 @@ export default function CandidatesPage() {
                       <span className="text-dim">·</span>
                       <span className="text-muted shrink-0">{(c.anchorConfidence * 100).toFixed(0)}%</span>
                     </div>
+
+                    <div className="flex items-center gap-0.5 sm:gap-1 mt-0.5">
+                      {[
+                        { k: "off", label: "原始" },
+                        { k: "vocal", label: "人声" },
+                        { k: "instrumental", label: "伴奏" },
+                      ].map((m) => {
+                        const vm = c.vocalMode ?? "off";
+                        const active = vm === m.k;
+                        return (
+                          <button
+                            key={m.k}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const next = (active ? "off" : m.k) as any;
+                              updateCandidate(c.id, { vocalMode: next });
+                              showToast("info", next === "off" ? "已恢复原始声像" : next === "vocal" ? "已切换为 · 人声聚焦" : "已切换为 · 伴奏纯净");
+                            }}
+                            className={cn(
+                              "rounded-[6px] px-1.5 py-0.5 text-[8px] sm:text-[10px] lg:text-[11px] transition",
+                              active
+                                ? "bg-[rgba(0,229,255,0.14)] text-[var(--accent-cyan)] ring-1 ring-[rgba(0,229,255,0.35)]"
+                                : "text-dim hover:text-1 hover:bg-[var(--bg-3)]"
+                            )}
+                          >
+                            {m.label}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
 
                   <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">

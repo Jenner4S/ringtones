@@ -29,7 +29,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   useKeyboardShortcuts();
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen overscroll-behavior-y-contain">
       {isLoading && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-bg/60 backdrop-blur-sm animate-in fade-in">
           <div className="glass rounded-[14px] px-6 py-4 flex items-center gap-3">
@@ -39,7 +39,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       )}
       <TopBar />
-      <div className="mx-auto flex min-h-[calc(100vh-56px)] w-full gap-3 sm:gap-4 lg:gap-6 px-3 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-4 lg:py-6 pb-20 sm:pb-24 lg:pb-6 max-w-full sm:max-w-[1000px] lg:max-w-[1300px] xl:max-w-[1500px] 2xl:max-w-[1600px]">
+      <div className="mx-auto flex min-h-[calc(100vh-56px)] w-full gap-3 sm:gap-4 lg:gap-6 px-3 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-4 lg:py-6 pb-[calc(env(safe-area-inset-bottom)+80px)] sm:pb-[calc(env(safe-area-inset-bottom)+96px)] lg:pb-6 max-w-full sm:max-w-[1000px] lg:max-w-[1300px] xl:max-w-[1500px] 2xl:max-w-[1600px]">
         <SideNav pathname={pathname} />
         <main className="min-w-0 flex-1">{children}</main>
       </div>
@@ -160,7 +160,7 @@ function SideNav({ pathname }: { pathname: string }) {
 
 function MobileTabBar({ pathname }: { pathname: string }) {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 flex lg:hidden items-center justify-around border-t border-app backdrop-blur-xl bg-[var(--bg-0)]/85 pb-[env(safe-area-inset-bottom)]">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 flex lg:hidden items-stretch justify-around border-t border-app backdrop-blur-xl bg-[var(--bg-0)]/85 pb-[env(safe-area-inset-bottom)]">
       {NAV.map((item) => {
         const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
         return (
@@ -168,12 +168,13 @@ function MobileTabBar({ pathname }: { pathname: string }) {
             key={item.href}
             href={item.href}
             className={cn(
-              "flex flex-1 flex-col items-center gap-0.5 py-2 transition",
+              "relative flex flex-1 flex-col items-center justify-center gap-0.5 py-2.5 min-h-[49px] transition-colors",
               active ? "text-[var(--accent-cyan)]" : "text-muted"
             )}
           >
-            <item.icon className="h-5 w-5" />
-            <span className="text-[10px]">{item.label}</span>
+            {active && <span className="absolute top-0 h-[2px] w-8 rounded-full bg-[var(--accent-cyan)]" />}
+            <item.icon className={cn("h-5 w-5 transition-transform", active && "scale-110")} />
+            <span className="text-[10px] leading-none">{item.label}</span>
           </Link>
         );
       })}

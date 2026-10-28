@@ -82,7 +82,7 @@ export function CandidateDetail({
         <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
           <button
             onClick={() => router.back()}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-muted hover:text-1 hover:bg-[var(--bg-3)] transition"
+            className="flex h-11 w-11 sm:h-9 sm:w-9 items-center justify-center rounded-lg text-muted hover:text-1 hover:bg-[var(--bg-3)] transition"
             aria-label="返回列表"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -143,7 +143,7 @@ export function CandidateDetail({
         </div>
       </div>
 
-      <div className="glass rounded-[12px] sm:rounded-[14px] p-3 sm:p-4">
+      <div className="glass rounded-[12px] sm:rounded-[14px] p-3 sm:p-4 hidden sm:block">
         <div className="text-[11px] text-dim mb-2">评分雷达 · 8 维</div>
         <div className="flex justify-center">
           <RadarChart data={candidate.scoreBreakdown} size={220} />
@@ -212,59 +212,62 @@ export function CandidateDetail({
         </ul>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-        <button
-          onClick={() => {
-            selectCandidate(candidate.id);
-            router.push("/workspace/editor");
-          }}
-          className="flex items-center justify-center gap-1.5 rounded-[10px] glass py-2.5 text-[12px] text-muted hover:text-1 hover:bg-[var(--bg-3)] transition"
-        >
-          <SkipForward className="h-3.5 w-3.5" />
-          精修
-        </button>
-        <button
-          onClick={() => {
-            toggleFavorite(candidate.id);
-          }}
-          className={cn(
-            "flex items-center justify-center gap-1.5 rounded-[10px] glass py-2.5 text-[12px] transition",
-            favorites.includes(candidate.id)
-              ? "text-[var(--accent-amber)] bg-[rgba(255,176,32,0.12)]"
-              : "text-muted hover:text-1 hover:bg-[var(--bg-3)]"
-          )}
-        >
-          {favorites.includes(candidate.id) ? "★ 已收藏" : "☆ 收藏"}
-        </button>
-        <button
-          onClick={() => {
-            const jitter = (v: number) => Math.max(0, Math.min(100, v + (Math.random() - 0.5) * 10));
-            const bd = { ...candidate.scoreBreakdown };
-            Object.keys(bd).forEach((k) => { bd[k] = jitter(bd[k] as number); });
-            const values = Object.values(bd) as number[];
-            const newScore = Math.round(values.reduce((a, b) => a + b, 0) / values.length);
-            updateCandidate(candidate.id, { scoreBreakdown: bd, score: newScore });
-            showToast("success", `重新评分完成 · ${newScore} 分`);
-          }}
-          className="flex items-center justify-center gap-1.5 rounded-[10px] glass py-2.5 text-[12px] text-muted hover:text-1 hover:bg-[var(--bg-3)] transition"
-        >
-          重新评分
-        </button>
-        <button
-          onClick={() => {
-            toggleExport(candidate.id);
-            showToast("success", inExport.includes(candidate.id) ? "已从导出列表移除" : "已加入导出列表");
-          }}
-          className={cn(
-            "flex items-center justify-center gap-1.5 rounded-[10px] py-2.5 text-[12px] font-medium transition",
-            inExport.includes(candidate.id)
-              ? "glass text-[var(--accent-green)]"
-              : "grad-primary text-[var(--bg-0)] hover:scale-[1.02]"
-          )}
-        >
-          <Download className="h-3.5 w-3.5" />
-          {inExport.includes(candidate.id) ? "已加入" : "加入导出"}
-        </button>
+      <div className="sticky bottom-0 z-20 -mx-3 sm:-mx-4 mt-3 sm:mt-4 border-t border-app bg-[var(--bg-0)]/85 backdrop-blur-xl px-3 sm:px-4 py-2.5 sm:py-3 pb-[calc(env(safe-area-inset-bottom)+10px)]">
+        <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+          <button
+            onClick={() => {
+              selectCandidate(candidate.id);
+              router.push("/workspace/editor");
+            }}
+            className="flex items-center justify-center gap-1.5 rounded-[10px] glass py-2.5 text-[12px] text-muted hover:text-1 hover:bg-[var(--bg-3)] transition min-h-[44px]"
+          >
+            <SkipForward className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">精修</span>
+            <span className="sm:hidden">编辑</span>
+          </button>
+          <button
+            onClick={() => {
+              toggleFavorite(candidate.id);
+            }}
+            className={cn(
+              "flex items-center justify-center gap-1.5 rounded-[10px] glass py-2.5 text-[12px] transition min-h-[44px]",
+              favorites.includes(candidate.id)
+                ? "text-[var(--accent-amber)] bg-[rgba(255,176,32,0.12)]"
+                : "text-muted hover:text-1 hover:bg-[var(--bg-3)]"
+            )}
+          >
+            {favorites.includes(candidate.id) ? "★ 已收藏" : "☆ 收藏"}
+          </button>
+          <button
+            onClick={() => {
+              const jitter = (v: number) => Math.max(0, Math.min(100, v + (Math.random() - 0.5) * 10));
+              const bd = { ...candidate.scoreBreakdown };
+              Object.keys(bd).forEach((k) => { bd[k] = jitter(bd[k] as number); });
+              const values = Object.values(bd) as number[];
+              const newScore = Math.round(values.reduce((a, b) => a + b, 0) / values.length);
+              updateCandidate(candidate.id, { scoreBreakdown: bd, score: newScore });
+              showToast("success", `重新评分完成 · ${newScore} 分`);
+            }}
+            className="hidden sm:flex items-center justify-center gap-1.5 rounded-[10px] glass py-2.5 text-[12px] text-muted hover:text-1 hover:bg-[var(--bg-3)] transition"
+          >
+            重新评分
+          </button>
+          <button
+            onClick={() => {
+              toggleExport(candidate.id);
+              showToast("success", inExport.includes(candidate.id) ? "已从导出列表移除" : "已加入导出列表");
+            }}
+            className={cn(
+              "flex items-center justify-center gap-1.5 rounded-[10px] py-2.5 text-[12px] font-medium transition min-h-[44px]",
+              inExport.includes(candidate.id)
+                ? "glass text-[var(--accent-green)]"
+                : "grad-primary text-[var(--bg-0)] hover:scale-[1.02]"
+            )}
+          >
+            <Download className="h-3.5 w-3.5" />
+            {inExport.includes(candidate.id) ? "已加入" : "加入导出"}
+          </button>
+        </div>
       </div>
 
       <audio ref={audioRef} preload="auto" />

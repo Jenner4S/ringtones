@@ -97,7 +97,7 @@ export default function CandidatesPage() {
 
   return (
     <>
-      <div className="grid grid-cols-1 gap-2 sm:gap-3 lg:gap-4 xl:grid-cols-[200px_minmax(0,1fr)_320px] 2xl:grid-cols-[220px_minmax(0,1fr)_360px]">
+      <div className="grid grid-cols-1 gap-2 sm:gap-3 lg:gap-4 xl:grid-cols-[200px_minmax(0,1fr)]">
       <SegmentNav />
 
       <div className="min-w-0 flex flex-col gap-2 sm:gap-3 lg:gap-4">
@@ -133,8 +133,6 @@ export default function CandidatesPage() {
         <div className="flex flex-col gap-1 sm:gap-2 lg:gap-3">
           <AnimatePresence initial={false}>
             {filtered.map((c, i) => {
-              const selected = c.id === selectedId;
-              const vm = c.vocalMode ?? "off";
               return (
                 <motion.div
                   key={c.id}
@@ -142,19 +140,14 @@ export default function CandidatesPage() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, height: 0 }}
                   transition={{ delay: i * 0.025 }}
-                  onClick={() => selectCandidate(c.id)}
+                  onClick={() => { selectCandidate(c.id); router.push(`/workspace/candidates/${c.id}`); }}
                   className={cn(
                     "group relative cursor-pointer transition-all glass flex items-center",
                     "gap-1.5 sm:gap-2.5 lg:gap-3",
                     "p-1.5 sm:p-2.5 lg:p-3 rounded-[10px] sm:rounded-[14px]",
-                    selected && "shadow-card border-[rgba(0,229,255,0.35)]"
+                    "hover:bg-[var(--bg-3)]/40"
                   )}
-                  style={selected ? { boxShadow: "0 0 0 1px rgba(0,229,255,0.2), var(--shadow-card)" } : undefined}
                 >
-                  {selected && (
-                    <div className="absolute left-0 top-1 bottom-1 w-[2px] sm:top-1.5 sm:bottom-1.5 rounded-full bg-[var(--accent-cyan)]" />
-                  )}
-
                   <div className="flex items-center shrink-0">
                     <ScoreRing score={c.score} size={22} stroke={2} showLabel className="sm:hidden" />
                     <ScoreRing score={c.score} size={36} stroke={2.8} showLabel className="hidden sm:flex md:hidden" />
@@ -179,50 +172,6 @@ export default function CandidatesPage() {
                       <span className="text-dim">·</span>
                       <span className="text-muted shrink-0">{(c.anchorConfidence * 100).toFixed(0)}%</span>
                     </div>
-
-                    <div className="flex items-center gap-0.5 sm:gap-1.5 flex-wrap">
-                      {[
-                        { k: "off", label: "原始" },
-                        { k: "vocal", label: "人声聚焦" },
-                        { k: "instrumental", label: "伴奏纯净" },
-                      ].map((m) => (
-                        <button
-                          key={m.k}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            const next = (vm === m.k ? "off" : m.k) as any;
-                            useStore.getState().updateCandidate(c.id, { vocalMode: next });
-                            showToast("info", next === "off" ? "已恢复原始声像" : next === "vocal" ? "已切换为 · 人声聚焦" : "已切换为 · 伴奏纯净");
-                          }}
-                          title={m.k === "off" ? "保留全频段" : m.k === "vocal" ? "提取纯净人声" : "去除人声"}
-                          className={cn(
-                            "rounded-[4px] sm:rounded-[7px] px-1 sm:px-2 py-0 sm:py-1 text-[9px] sm:text-[11px] transition num-mono",
-                            vm === m.k
-                              ? "bg-[rgba(0,229,255,0.14)] text-[var(--accent-cyan)] ring-1 ring-[rgba(0,229,255,0.35)]"
-                              : "text-dim sm:text-muted hover:text-1 hover:bg-[var(--bg-3)]"
-                          )}
-                        >
-                          {m.label}
-                        </button>
-                      ))}
-                      {vm !== "off" && (
-                        <span className="text-[8px] sm:text-[10px] num-mono text-[var(--accent-cyan)]">· 声像处理中</span>
-                      )}
-                    </div>
-
-                    {selected && (
-                      <div className="h-6 sm:h-10 opacity-80 sm:opacity-0 sm:group-hover:opacity-100 transition">
-                        <WaveformCanvas
-                          peaks={project.analysis?.waveformPeaks ?? []}
-                          duration={project.analysis?.duration ?? 0}
-                          height={24}
-                          interactive={false}
-                          showRuler={false}
-                          selectedStart={c.start}
-                          selectedEnd={c.end}
-                        />
-                      </div>
-                    )}
                   </div>
 
                   <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
@@ -261,17 +210,6 @@ export default function CandidatesPage() {
                     >
                       <Flag className={cn("h-2.5 w-2.5 sm:h-3.5 sm:w-3.5 lg:h-4 lg:w-4", favorites.includes(c.id) && "text-[var(--accent-amber)]")} />
                     </button>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        selectCandidate(c.id);
-                        router.push("/workspace/editor");
-                      }}
-                      aria-label="更多"
-                      className="flex h-6 w-6 sm:h-8 sm:w-8 lg:h-9 lg:w-9 items-center justify-center rounded-full glass opacity-60 sm:opacity-0 sm:group-hover:opacity-100 hover:opacity-100 hover:scale-105 transition"
-                    >
-                      <MoreHorizontal className="h-2.5 w-2.5 sm:h-3.5 sm:w-3.5 lg:h-4 lg:w-4 text-muted" />
-                    </button>
                   </div>
                 </motion.div>
               );
@@ -286,20 +224,6 @@ export default function CandidatesPage() {
           )}
         </div>
       </div>
-
-      <AnimatePresence mode="wait">
-        {selected && (
-          <motion.div
-            key={selected.id}
-            initial={{ opacity: 0, x: 8 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -8 }}
-            className="flex flex-col gap-4"
-          >
-            <DetailPanel candidate={selected} peaks={project.analysis?.waveformPeaks ?? []} duration={project.analysis?.duration ?? 0} />
-          </motion.div>
-        )}
-      </AnimatePresence>
       </div>
 
       <audio ref={audioRef} preload="auto" />
@@ -311,6 +235,7 @@ function SegmentNav() {
   const project = useStore((s) => s.currentProject);
   const selectCandidate = useStore((s) => s.selectCandidate);
   const filtered = useFilteredCandidates();
+  const router = useRouter();
   if (!project) return null;
 
   const bySegment = new Map<string, number>();
@@ -328,7 +253,10 @@ function SegmentNav() {
             key={seg}
             onClick={() => {
               const first = filtered.find((c) => c.segment === seg);
-              if (first) selectCandidate(first.id);
+              if (first) {
+                selectCandidate(first.id);
+                router.push(`/workspace/candidates/${first.id}`);
+              }
             }}
             className="flex items-center justify-between rounded-[8px] px-2.5 py-1.5 text-[12px] text-muted hover:bg-[var(--bg-3)] hover:text-1 transition"
           >

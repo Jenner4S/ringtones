@@ -247,8 +247,8 @@ export function createMockProject(duration = 213, bpm = 132): Project {
     file: {
       id: "f-01",
       name: "再见我的孤独-ZARD.m4a",
-      path: "/audio/再见我的孤独-ZARD.m4a",
-      url: "/audio/再见我的孤独-ZARD.m4a",
+      path: "",
+      url: "",
       duration,
       sizeBytes: Math.round(5_000_000 * (duration / 213)),
       format: "M4A / AAC",

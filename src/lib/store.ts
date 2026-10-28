@@ -8,6 +8,13 @@ function isBlobUrl(url?: string): url is string {
   return !!url && url.startsWith("blob:");
 }
 
+function stripBlobUrl(p?: Project): Project | undefined {
+  if (!p?.file) return p;
+  if (!p.file.url) return p;
+  if (!isBlobUrl(p.file.url)) return p;
+  return { ...p, file: { ...p.file, url: undefined } };
+}
+
 function revokeBlobUrl(url?: string) {
   if (!isBlobUrl(url)) return;
   try { URL.revokeObjectURL(url); } catch {}
@@ -221,23 +228,26 @@ export const useStore = create<StoreState>()(
     }),
     {
       name: "ringtonemaster-v4",
-      version: 2,
+      version: 3,
       partialize: (s) => ({
         theme: s.theme,
         settings: s.settings,
         favorites: s.favorites,
-        projects: s.projects,
-        currentProject: s.currentProject,
+        projects: s.projects.map(stripBlobUrl),
+        currentProject: stripBlobUrl(s.currentProject),
       }),
       migrate: (persistedState) => {
         const mock = createMockProject();
-        const ps = persistedState as Record<string, unknown>;
-        const hasCurrent = (ps?.currentProject as Record<string, unknown>)?.file;
-        const projects = ps?.projects as unknown[] | undefined;
+        const ps = (persistedState as Record<string, unknown>) ?? {};
+        const cur = stripBlobUrl(ps.currentProject as Project | undefined) ?? mock;
+        const projs = ((ps.projects as Project[]) ?? []).map(stripBlobUrl).filter(Boolean) as Project[];
         return {
+          theme: (ps.theme ?? "dark") as "dark" | "light",
+          settings: (ps.settings ?? {}) as AppSettings,
+          favorites: (ps.favorites ?? []) as string[],
           ...ps,
-          currentProject: hasCurrent ? ps.currentProject : mock,
-          projects: projects?.length ? ps.projects : [mock],
+          currentProject: cur,
+          projects: projs.length ? projs : [mock],
         };
       },
     }

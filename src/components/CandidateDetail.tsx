@@ -12,7 +12,8 @@ import { QABadge } from "@/components/QABadge";
 import { SeamView } from "@/components/SeamView";
 import { ParamSlider } from "@/components/ParamSlider";
 import { ScoreRing } from "@/components/ScoreRing";
-import type { Candidate } from "@/lib/types";
+import { useAudioPipeline } from "@/hooks/useAudioPipeline";
+import type { Candidate, VocalMode } from "@/lib/types";
 
 export function CandidateDetail({
   candidate,
@@ -38,6 +39,9 @@ export function CandidateDetail({
   const [playing, setPlaying] = useState(false);
 
   const audioUrl = project?.file?.url ?? "";
+  const vocalMode = (candidate.vocalMode ?? "off") as VocalMode;
+
+  const { resumeAndApply } = useAudioPipeline(audioRef, vocalMode);
 
   const togglePlay = () => {
     const audio = audioRef.current;
@@ -48,6 +52,7 @@ export function CandidateDetail({
     } else {
       if (!audio.src || audio.src !== audioUrl) audio.src = audioUrl;
       audio.currentTime = candidate.start;
+      resumeAndApply();
       audio.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
     }
   };

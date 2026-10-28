@@ -7,6 +7,8 @@ import { Play, Pause, Check, SkipForward, MoreHorizontal, Filter, ArrowUpDown, P
 import { useStore, useFilteredCandidates } from "@/lib/store";
 import { useAudioUrlFallback } from "@/hooks/useAudioUrlFallback";
 import { useAudioSegment } from "@/hooks/useAudioSegment";
+import { useAudioPipeline } from "@/hooks/useAudioPipeline";
+import type { VocalMode } from "@/lib/types";
 import { formatTime, formatDuration, cn } from "@/lib/utils";
 import { ScoreRing } from "@/components/ScoreRing";
 import { RadarChart } from "@/components/RadarChart";
@@ -40,6 +42,7 @@ export default function CandidatesPage() {
   const filtered = useFilteredCandidates();
   const selected = useMemo(() => filtered.find((c) => c.id === selectedId) ?? filtered[0], [filtered, selectedId]);
   const [playingId, setPlayingId] = useState<string | null>(null);
+  const [playingVocalMode, setPlayingVocalMode] = useState<VocalMode>("off");
   const activeRangeRef = useRef<{ start: number; end: number } | null>(null);
 
   useAudioUrlFallback(project, setProject);
@@ -63,6 +66,8 @@ export default function CandidatesPage() {
     },
   });
 
+  const { resumeAndApply } = useAudioPipeline(audioRef, playingVocalMode);
+
   const playCandidate = (candidate: (typeof filtered)[number]) => {
     if (!project?.file.url) {
       showToast("error", "音频未就绪");
@@ -72,6 +77,7 @@ export default function CandidatesPage() {
       const audio = audioRef.current;
       if (!audio) return;
       if (audio.paused) {
+        resumeAndApply();
         void safePlay();
         setPlayingId(candidate.id);
       } else {
@@ -81,8 +87,11 @@ export default function CandidatesPage() {
       return;
     }
     safePause();
+    const vm = (candidate.vocalMode ?? "off") as VocalMode;
+    setPlayingVocalMode(vm);
     activeRangeRef.current = { start: candidate.start, end: candidate.end };
     safePlay((audio) => {
+      resumeAndApply();
       audio.currentTime = candidate.start;
     }).then((ok) => {
       if (ok) setPlayingId(candidate.id);
@@ -92,6 +101,14 @@ export default function CandidatesPage() {
   useEffect(() => {
     if (playingId) return () => safePause();
   }, [playingId, safePause]);
+
+  useEffect(() => {
+    if (!playingId) return;
+    const cur = filtered.find((c) => c.id === playingId);
+    if (!cur) return;
+    const vm = (cur.vocalMode ?? "off") as VocalMode;
+    if (vm !== playingVocalMode) setPlayingVocalMode(vm);
+  }, [playingId, filtered, playingVocalMode]);
 
   if (!project || !project.analysis) return null;
 

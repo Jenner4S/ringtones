@@ -1,5 +1,6 @@
 node_modules/
 .next/
+out/
 dist/
 coverage/
 *.log
@@ -14,7 +15,10 @@ test-results/
 playwright-report/
 *.mp3
 *.m4a
+*.m4r
 *.wav
 *.ogg
 *.flac
 *.aac
+*.tgz
+*.json.backup

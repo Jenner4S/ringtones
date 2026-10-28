@@ -144,9 +144,9 @@ export default function CandidatesPage() {
                   transition={{ delay: i * 0.025 }}
                   onClick={() => selectCandidate(c.id)}
                   className={cn(
-                    "group relative rounded-[10px] sm:rounded-[14px] cursor-pointer transition-all glass",
-                    "p-1.5 sm:p-2.5 lg:p-3",
-                    "flex gap-1 sm:gap-2.5 lg:gap-3 items-center",
+                    "group relative cursor-pointer transition-all glass flex items-center",
+                    "gap-1.5 sm:gap-2.5 lg:gap-3",
+                    "p-1.5 sm:p-2.5 lg:p-3 rounded-[10px] sm:rounded-[14px]",
                     selected && "shadow-card border-[rgba(0,229,255,0.35)]"
                   )}
                   style={selected ? { boxShadow: "0 0 0 1px rgba(0,229,255,0.2), var(--shadow-card)" } : undefined}
@@ -155,111 +155,32 @@ export default function CandidatesPage() {
                     <div className="absolute left-0 top-1 bottom-1 w-[2px] sm:top-1.5 sm:bottom-1.5 rounded-full bg-[var(--accent-cyan)]" />
                   )}
 
-                  {/* ════ Mobile 2-row mode ════ */}
-                  <div className="sm:hidden flex-1 min-w-0">
-                    {/* Row 1: ScoreRing + #idx + title + duration + export */}
-                    <div className="flex items-center gap-1 min-w-0">
-                      <ScoreRing score={c.score} size={22} stroke={2} showLabel />
-                      <span className="num-mono text-[9px] text-dim shrink-0">#{String(c.index).padStart(2, "0")}</span>
-                      <span className="font-display text-[12px] font-medium truncate min-w-0 flex-1">{c.segment}</span>
-                      <span className="num-mono text-[9px] text-1 shrink-0">·{formatDuration(c.duration)}</span>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleExport(c.id);
-                          showToast("success", inExport.includes(c.id) ? "已从导出列表移除" : "已加入导出列表");
-                        }}
-                        aria-label="导出"
-                        className={cn(
-                          "flex h-5 w-5 items-center justify-center rounded-full glass transition shrink-0",
-                          inExport.includes(c.id) && "bg-[rgba(46,230,168,0.2)]"
-                        )}
-                      >
-                        <Check className={cn("h-2.5 w-2.5", inExport.includes(c.id) && "text-[var(--accent-green)]")} />
-                      </button>
-                    </div>
-                    {/* Row 2: time + vocal + play + fav */}
-                    <div className="flex items-center gap-1 mt-1 min-w-0">
-                      <span className="num-mono text-[8.5px] text-muted shrink-0 tabular-nums">
-                        {formatTime(c.start)}→{formatTime(c.end)}
-                      </span>
-                      <div className="flex items-center gap-0.5 flex-1 min-w-0 overflow-hidden">
-                        {[
-                          { k: "off", label: "原始" },
-                          { k: "vocal", label: "人声" },
-                          { k: "instrumental", label: "伴奏" },
-                        ].map((m) => (
-                          <button
-                            key={m.k}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              const next = (vm === m.k ? "off" : m.k) as any;
-                              useStore.getState().updateCandidate(c.id, { vocalMode: next });
-                              showToast("info", next === "off" ? "已恢复原始声像" : next === "vocal" ? "已切换为 · 人声聚焦" : "已切换为 · 伴奏纯净");
-                            }}
-                            title={m.k === "off" ? "保留全频段" : m.k === "vocal" ? "提取纯净人声" : "去除人声"}
-                            className={cn(
-                              "rounded-[4px] px-1 py-0 text-[9px] transition num-mono whitespace-nowrap",
-                              vm === m.k
-                                ? "bg-[rgba(0,229,255,0.14)] text-[var(--accent-cyan)]"
-                                : "text-dim hover:text-muted"
-                            )}
-                          >
-                            {m.label}
-                          </button>
-                        ))}
-                      </div>
-                      <button
-                        onClick={(e) => { e.stopPropagation(); playCandidate(c); }}
-                        className="flex h-5 w-5 items-center justify-center rounded-full glass shrink-0"
-                        aria-label="播放"
-                      >
-                        {playingId === c.id ? (
-                          <Pause className="h-2.5 w-2.5 text-[var(--accent-cyan)]" />
-                        ) : (
-                          <Play className="h-2.5 w-2.5 text-[var(--accent-cyan)]" />
-                        )}
-                      </button>
-                      <button
-                        onClick={(e) => { e.stopPropagation(); toggleFav(c.id); }}
-                        aria-label="收藏"
-                        className={cn(
-                          "flex h-5 w-5 items-center justify-center rounded-full glass shrink-0",
-                          favorites.includes(c.id) && "bg-[rgba(255,176,32,0.2)]"
-                        )}
-                      >
-                        <Flag className={cn("h-2.5 w-2.5", favorites.includes(c.id) && "text-[var(--accent-amber)]")} />
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* ════ Desktop flex-row mode (sm+) ════ */}
-                  <div className="hidden sm:flex items-center shrink-0">
-                    <ScoreRing score={c.score} size={36} stroke={2.8} showLabel className="md:hidden" />
+                  <div className="flex items-center shrink-0">
+                    <ScoreRing score={c.score} size={22} stroke={2} showLabel className="sm:hidden" />
+                    <ScoreRing score={c.score} size={36} stroke={2.8} showLabel className="hidden sm:flex md:hidden" />
                     <ScoreRing score={c.score} size={40} stroke={3} showLabel className="hidden md:flex lg:hidden" />
                     <ScoreRing score={c.score} size={44} stroke={3.5} showLabel className="hidden lg:flex" />
                   </div>
 
-                  <div className="hidden sm:flex min-w-0 flex-1 flex-col gap-1 lg:gap-1.5">
-                    <div className="flex items-center gap-1.5 flex-wrap min-w-0">
-                      <span className="num-mono text-[11px] text-dim shrink-0">#{String(c.index).padStart(2, "0")}</span>
-                      <span className="font-display text-[14px] font-medium truncate min-w-0">{c.segment} 片段</span>
-                      <Badge variant={c.relaxed ? "amber" : "cyan"} dot>{c.relaxed ? "放宽" : "AUTO"}</Badge>
-                      <Badge variant="muted" className="hidden md:inline-flex">{c.loopStrategy}</Badge>
-                      <QABadge qa={c.qa} />
+                  <div className="min-w-0 flex-1 flex flex-col gap-0.5 sm:gap-1 lg:gap-1.5">
+                    <div className="flex items-center gap-0.5 sm:gap-1.5 flex-wrap min-w-0">
+                      <span className="num-mono text-[8.5px] sm:text-[11px] text-dim shrink-0">#{String(c.index).padStart(2, "0")}</span>
+                      <span className="font-display text-[11px] sm:text-[14px] font-medium truncate min-w-0 max-w-[45%] sm:max-w-none">{c.segment}</span>
+                      <span className="num-mono text-[8px] sm:text-[11px] text-1 shrink-0">·{formatDuration(c.duration)}</span>
+                      <Badge variant={c.relaxed ? "amber" : "cyan"} dot className="!text-[8px] !px-1 !py-0 sm:!text-[11px] sm:!px-2 sm:!py-0.5">{c.relaxed ? "放宽" : "AUTO"}</Badge>
+                      <Badge variant="muted" className="!text-[8px] !px-1 !py-0 sm:!text-[11px] sm:!px-2 sm:!py-0.5">{c.loopStrategy}</Badge>
+                      <QABadge qa={c.qa} className="!text-[8px] !px-1 !py-0 sm:!text-[11px] sm:!px-2 sm:!py-0.5" />
                     </div>
 
-                    <div className="flex items-center gap-2 sm:gap-3 text-[11px] num-mono">
-                      <span className="text-muted">{formatTime(c.start)} → {formatTime(c.end)}</span>
-                      <span className="text-dim hidden md:inline">·</span>
-                      <span className="text-1 hidden md:inline">{formatDuration(c.duration)}</span>
-                      <span className="text-dim hidden lg:inline">·</span>
-                      <span className="text-muted hidden lg:inline">锚点 {c.anchorType}</span>
-                      <span className="text-dim hidden xl:inline">·</span>
-                      <span className="text-muted hidden xl:inline">{(c.anchorConfidence * 100).toFixed(0)}%</span>
+                    <div className="flex items-center gap-1 sm:gap-3 text-[8px] sm:text-[11px] num-mono flex-wrap">
+                      <span className="text-muted shrink-0 tabular-nums">{formatTime(c.start)}→{formatTime(c.end)}</span>
+                      <span className="text-dim">·</span>
+                      <span className="text-muted shrink-0">锚点 {c.anchorType}</span>
+                      <span className="text-dim">·</span>
+                      <span className="text-muted shrink-0">{(c.anchorConfidence * 100).toFixed(0)}%</span>
                     </div>
 
-                    <div className="flex items-center gap-1 sm:gap-1.5 flex-wrap">
+                    <div className="flex items-center gap-0.5 sm:gap-1.5 flex-wrap">
                       {[
                         { k: "off", label: "原始" },
                         { k: "vocal", label: "人声聚焦" },
@@ -275,26 +196,26 @@ export default function CandidatesPage() {
                           }}
                           title={m.k === "off" ? "保留全频段" : m.k === "vocal" ? "提取纯净人声" : "去除人声"}
                           className={cn(
-                            "rounded-[7px] px-2 py-1 text-[11px] transition num-mono",
+                            "rounded-[4px] sm:rounded-[7px] px-1 sm:px-2 py-0 sm:py-1 text-[9px] sm:text-[11px] transition num-mono",
                             vm === m.k
                               ? "bg-[rgba(0,229,255,0.14)] text-[var(--accent-cyan)] ring-1 ring-[rgba(0,229,255,0.35)]"
-                              : "text-muted hover:text-1 hover:bg-[var(--bg-3)]"
+                              : "text-dim sm:text-muted hover:text-1 hover:bg-[var(--bg-3)]"
                           )}
                         >
                           {m.label}
                         </button>
                       ))}
                       {vm !== "off" && (
-                        <span className="text-[10px] num-mono text-[var(--accent-cyan)]">· 声像处理中</span>
+                        <span className="text-[8px] sm:text-[10px] num-mono text-[var(--accent-cyan)]">· 声像处理中</span>
                       )}
                     </div>
 
                     {selected && (
-                      <div className="mt-1 h-10 opacity-0 group-hover:opacity-100 transition">
+                      <div className="h-6 sm:h-10 opacity-80 sm:opacity-0 sm:group-hover:opacity-100 transition">
                         <WaveformCanvas
                           peaks={project.analysis?.waveformPeaks ?? []}
                           duration={project.analysis?.duration ?? 0}
-                          height={40}
+                          height={24}
                           interactive={false}
                           showRuler={false}
                           selectedStart={c.start}
@@ -304,16 +225,16 @@ export default function CandidatesPage() {
                     )}
                   </div>
 
-                  <div className="hidden sm:flex items-center gap-1 shrink-0">
+                  <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
                     <button
                       onClick={(e) => { e.stopPropagation(); playCandidate(c); }}
-                      className="flex h-8 w-8 lg:h-9 lg:w-9 items-center justify-center rounded-full glass hover:scale-105 active:scale-95 transition"
+                      className="flex h-6 w-6 sm:h-8 sm:w-8 lg:h-9 lg:w-9 items-center justify-center rounded-full glass hover:scale-105 active:scale-95 transition"
                       aria-label="播放"
                     >
                       {playingId === c.id ? (
-                        <Pause className="h-3.5 w-3.5 lg:h-4 lg:w-4 text-[var(--accent-cyan)]" />
+                        <Pause className="h-2.5 w-2.5 sm:h-3.5 sm:w-3.5 lg:h-4 lg:w-4 text-[var(--accent-cyan)]" />
                       ) : (
-                        <Play className="h-3.5 w-3.5 lg:h-4 lg:w-4 text-[var(--accent-cyan)]" />
+                        <Play className="h-2.5 w-2.5 sm:h-3.5 sm:w-3.5 lg:h-4 lg:w-4 text-[var(--accent-cyan)]" />
                       )}
                     </button>
                     <button
@@ -324,21 +245,21 @@ export default function CandidatesPage() {
                       }}
                       aria-label="加入导出"
                       className={cn(
-                        "flex h-8 w-8 lg:h-9 lg:w-9 items-center justify-center rounded-full glass hover:scale-105 active:scale-95 transition",
+                        "flex h-6 w-6 sm:h-8 sm:w-8 lg:h-9 lg:w-9 items-center justify-center rounded-full glass hover:scale-105 active:scale-95 transition",
                         inExport.includes(c.id) && "bg-[rgba(46,230,168,0.18)]"
                       )}
                     >
-                      <Check className={cn("h-3.5 w-3.5 lg:h-4 lg:w-4", inExport.includes(c.id) && "text-[var(--accent-green)]")} />
+                      <Check className={cn("h-2.5 w-2.5 sm:h-3.5 sm:w-3.5 lg:h-4 lg:w-4", inExport.includes(c.id) && "text-[var(--accent-green)]")} />
                     </button>
                     <button
                       onClick={(e) => { e.stopPropagation(); toggleFav(c.id); }}
                       aria-label="收藏"
                       className={cn(
-                        "flex h-8 w-8 lg:h-9 lg:w-9 items-center justify-center rounded-full glass hover:scale-105 active:scale-95 transition",
+                        "flex h-6 w-6 sm:h-8 sm:w-8 lg:h-9 lg:w-9 items-center justify-center rounded-full glass hover:scale-105 active:scale-95 transition",
                         favorites.includes(c.id) && "bg-[rgba(255,176,32,0.18)]"
                       )}
                     >
-                      <Flag className={cn("h-3.5 w-3.5 lg:h-4 lg:w-4", favorites.includes(c.id) && "text-[var(--accent-amber)]")} />
+                      <Flag className={cn("h-2.5 w-2.5 sm:h-3.5 sm:w-3.5 lg:h-4 lg:w-4", favorites.includes(c.id) && "text-[var(--accent-amber)]")} />
                     </button>
                     <button
                       onClick={(e) => {
@@ -347,9 +268,9 @@ export default function CandidatesPage() {
                         router.push("/workspace/editor");
                       }}
                       aria-label="更多"
-                      className="flex h-8 w-8 lg:h-9 lg:w-9 items-center justify-center rounded-full glass opacity-0 group-hover:opacity-100 hover:scale-105 transition"
+                      className="flex h-6 w-6 sm:h-8 sm:w-8 lg:h-9 lg:w-9 items-center justify-center rounded-full glass opacity-60 sm:opacity-0 sm:group-hover:opacity-100 hover:opacity-100 hover:scale-105 transition"
                     >
-                      <MoreHorizontal className="h-3.5 w-3.5 lg:h-4 lg:w-4 text-muted" />
+                      <MoreHorizontal className="h-2.5 w-2.5 sm:h-3.5 sm:w-3.5 lg:h-4 lg:w-4 text-muted" />
                     </button>
                   </div>
                 </motion.div>

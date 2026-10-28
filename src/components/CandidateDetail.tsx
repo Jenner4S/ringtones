@@ -12,6 +12,7 @@ import { QABadge } from "@/components/QABadge";
 import { SeamView } from "@/components/SeamView";
 import { ParamSlider } from "@/components/ParamSlider";
 import { ScoreRing } from "@/components/ScoreRing";
+import { FreqResponseChart } from "@/components/FreqResponseChart";
 import { useAudioPipeline } from "@/hooks/useAudioPipeline";
 import type { Candidate, VocalMode } from "@/lib/types";
 
@@ -115,6 +116,10 @@ export function CandidateDetail({
               progress={playing ? undefined : undefined}
             />
           </div>
+        </div>
+
+        <div className="mb-2">
+          <FreqResponseChart mode={vocalMode} height={100} />
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">

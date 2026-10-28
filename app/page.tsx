@@ -241,108 +241,17 @@ export default function HomePage() {
     <AppShell>
       <Toast />
       <div className="flex min-h-[calc(100vh-140px)] flex-col gap-10 pb-24">
-        <Hero dragOver={dragOver} setDragOver={setDragOver} handleFiles={handleFiles} />
-
-        <AnimatePresence>
-          {extracting && (
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              className="glass rounded-[16px] p-5 shadow-card"
-            >
-              <div className="flex items-center gap-4">
-                <div className="flex h-14 w-14 items-center justify-center rounded-[12px] bg-[var(--bg-2)]">
-                  <Loader2 className="h-6 w-6 text-[var(--accent-cyan)] animate-spin" strokeWidth={2.4} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="font-display text-[14px] font-medium truncate">{extracting.fileName}</span>
-                    <SourceBadge source={extracting.source} />
-                  </div>
-                  {extracting.sourceHint && (
-                    <div className="mt-0.5 text-[10px] text-dim truncate num-mono">{extracting.sourceHint}</div>
-                  )}
-                  <div className="mt-2 text-[11px] text-dim">
-                    {sourceStageText(extracting.source)}
-                  </div>
-                  <div className="mt-3 h-1.5 w-full rounded-full bg-[var(--bg-3)] overflow-hidden">
-                    <motion.div
-                      className="h-full grad-primary"
-                      initial={{ width: 0 }}
-                      animate={{ width: `${extracting.pct}%` }}
-                      transition={{ duration: 0.2 }}
-                    />
-                  </div>
-                  <div className="mt-1 flex justify-between text-[10px] text-dim num-mono">
-                    <span>{extracting.stage}</span>
-                    <span>{extracting.pct}%</span>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {file && (
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              className="glass rounded-[16px] p-5 shadow-card"
-            >
-              <div className="flex items-center justify-between gap-4">
-                <div className="flex items-center gap-4 min-w-0">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-[12px] grad-primary">
-                    {file.sourceKind === "video" ? (
-                      <Video className="h-6 w-6 text-[var(--bg-0)]" strokeWidth={2.4} />
-                    ) : (
-                      <Music2 className="h-6 w-6 text-[var(--bg-0)]" strokeWidth={2.4} />
-                    )}
-                  </div>
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="font-display text-[15px] font-medium truncate">{file.name}</span>
-                      <SourceBadge source={file.extractionSource} />
-                      {file.sourceKind === "video" && file.extractionSource === "file" && (
-                        <span className="shrink-0 inline-flex items-center gap-1 rounded-full bg-[var(--bg-3)] px-2 py-0.5 text-[10px] text-[var(--accent-cyan)] num-mono">
-                          <Video className="h-2.5 w-2.5" /> 来自 {file.sourceFormat}
-                        </span>
-                      )}
-                    </div>
-                    <div className="mt-1 flex items-center gap-3 text-[11px] text-dim num-mono">
-                      <span>{formatTime(file.duration)}</span>
-                      <span>·</span>
-                      <span>{file.format}</span>
-                      {file.size > 0 && (
-                        <>
-                          <span>·</span>
-                          <span>{(file.size / 1024 / 1024).toFixed(1)} MB</span>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </div>
-                <button
-                  onClick={startAnalysis}
-                  className="group relative flex h-11 items-center gap-2 overflow-hidden rounded-[12px] px-5 text-[13px] font-semibold text-[var(--bg-0)] grad-primary shadow-card transition hover:scale-[1.02] active:scale-[0.98]"
-                >
-                  <Zap className="h-4 w-4" strokeWidth={2.4} />
-                  开始智能分析
-                  <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
-                </button>
-              </div>
-              <div className="mt-4 h-20">
-                <WaveformCanvas
-                  peaks={generateDemoPeaks(200, file.duration)}
-                  duration={file.duration}
-                  height={80}
-                  interactive={false}
-                  showRuler={false}
-                />
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        <Hero
+          dragOver={dragOver}
+          setDragOver={setDragOver}
+          handleFiles={handleFiles}
+          extracting={extracting}
+          file={file}
+          startAnalysis={startAnalysis}
+          onReset={() => { setFile(null); }}
+          sourceStageText={sourceStageText}
+          generatePeaks={generateDemoPeaks}
+        />
 
         <RecentSection />
         <FeatureBar />
@@ -366,12 +275,30 @@ function Hero({
   dragOver,
   setDragOver,
   handleFiles,
+  extracting,
+  file,
+  startAnalysis,
+  onReset,
+  sourceStageText,
+  generatePeaks,
 }: {
   dragOver: boolean;
   setDragOver: (b: boolean) => void;
   handleFiles: (f: FileList | File[]) => void;
+  extracting: ExtractingState | null;
+  file: FileState | null;
+  startAnalysis: () => void;
+  onReset: () => void;
+  sourceStageText: (s: ExtractionSource) => string;
+  generatePeaks: (n: number, d: number) => number[];
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const mode: "upload" | "extracting" | "preview" = extracting
+    ? "extracting"
+    : file
+      ? "preview"
+      : "upload";
+
   return (
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="pt-8">
       <div className="mb-8 text-center">
@@ -426,52 +353,186 @@ function Hero({
         initial={{ opacity: 0, scale: 0.98 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.2, duration: 0.4 }}
-        onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-        onDragLeave={() => setDragOver(false)}
-        onDrop={(e) => { e.preventDefault(); setDragOver(false); handleFiles(e.dataTransfer.files); }}
-        onClick={() => inputRef.current?.click()}
-        role="button"
-        tabIndex={0}
-        className={`group relative cursor-pointer overflow-hidden rounded-[24px] border-[1.5px] border-dashed p-10 md:p-14 text-center transition-all ${
-          dragOver ? "border-transparent grad-primary scale-[1.01]" : "border-[var(--border-strong)] hover:border-[rgba(0,229,255,0.4)]"
+        className={`relative overflow-hidden rounded-[24px] transition-all ${
+          mode === "upload"
+            ? `border-[1.5px] border-dashed ${
+                dragOver ? "border-transparent grad-primary scale-[1.01]" : "border-[var(--border-strong)] hover:border-[rgba(0,229,255,0.4)]"
+              }`
+            : "border-[var(--border-strong)] glass"
         }`}
-        style={{
-          background: dragOver
-            ? "linear-gradient(180deg, rgba(0,229,255,0.12), rgba(124,92,255,0.10))"
-            : "linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.005))",
-        }}
+        style={
+          mode === "upload"
+            ? {
+                background: dragOver
+                  ? "linear-gradient(180deg, rgba(0,229,255,0.12), rgba(124,92,255,0.10))"
+                  : "linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.005))",
+              }
+            : undefined
+        }
       >
-        <input ref={inputRef} type="file" accept="audio/*,video/*" className="hidden" onChange={(e) => e.target.files && handleFiles(e.target.files)} />
-
-        <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-[16px] glass-strong mb-5 group-hover:animate-pulse-glow">
-          <motion.div animate={{ rotate: dragOver ? 180 : 0 }} transition={{ duration: 0.4 }}>
-            <Upload className="h-8 w-8 text-[var(--accent-cyan)]" strokeWidth={1.8} />
-          </motion.div>
-        </div>
-
-        <div className="font-display text-[18px] md:text-[20px] font-semibold">
-          把音频 / 视频拖到这里，或点击选择
-        </div>
-        <div className="mt-2 text-[12px] text-dim hidden sm:block">
-          也可以按 <kbd className="inline-block rounded bg-[var(--bg-3)] px-1.5 py-0.5 text-[10px] num-mono text-muted mx-0.5">⌘</kbd>+<kbd className="inline-block rounded bg-[var(--bg-3)] px-1.5 py-0.5 text-[10px] num-mono text-muted mx-0.5">V</kbd> 粘贴，或点下方 <kbd className="inline-block rounded bg-[var(--bg-3)] px-1.5 py-0.5 text-[10px] num-mono text-muted mx-0.5">+</kbd> 输入 URL
-        </div>
-
-        <div className="mt-6 flex justify-center gap-2 text-[11px] flex-wrap">
-          {[
-            { icon: Music2, label: "音频直进", showMobile: true },
-            { icon: Video, label: "视频抽音", showMobile: true },
-            { icon: Link2, label: "URL 下载", showMobile: true },
-            { icon: ClipboardPaste, label: "剪贴板粘贴", showMobile: false },
-          ].map(({ icon: Icon, label, showMobile }) => (
-            <span
-              key={label}
-              className={`inline-flex items-center gap-1.5 rounded-full border border-app bg-[var(--bg-2)] px-3 py-1 text-muted ${showMobile ? "" : "hidden sm:inline-flex"}`}
+        <AnimatePresence mode="wait">
+          {mode === "upload" && (
+            <motion.div
+              key="upload"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="group cursor-pointer p-8 sm:p-10 md:p-14 text-center"
+              onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+              onDragLeave={() => setDragOver(false)}
+              onDrop={(e) => { e.preventDefault(); setDragOver(false); handleFiles(e.dataTransfer.files); }}
+              onClick={() => inputRef.current?.click()}
+              role="button"
+              tabIndex={0}
             >
-              <Icon className="h-3 w-3 text-[var(--accent-cyan)]" />
-              {label}
-            </span>
-          ))}
-        </div>
+              <input ref={inputRef} type="file" accept="audio/*,video/*" className="hidden" onChange={(e) => e.target.files && handleFiles(e.target.files)} />
+
+              <div className="mx-auto flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-[16px] glass-strong mb-4 sm:mb-5 group-hover:animate-pulse-glow">
+                <motion.div animate={{ rotate: dragOver ? 180 : 0 }} transition={{ duration: 0.4 }}>
+                  <Upload className="h-7 w-7 sm:h-8 sm:w-8 text-[var(--accent-cyan)]" strokeWidth={1.8} />
+                </motion.div>
+              </div>
+
+              <div className="font-display text-[17px] sm:text-[18px] md:text-[20px] font-semibold">
+                把音频 / 视频拖到这里，或点击选择
+              </div>
+              <div className="mt-2 text-[12px] text-dim hidden sm:block">
+                也可以按 <kbd className="inline-block rounded bg-[var(--bg-3)] px-1.5 py-0.5 text-[10px] num-mono text-muted mx-0.5">⌘</kbd>+<kbd className="inline-block rounded bg-[var(--bg-3)] px-1.5 py-0.5 text-[10px] num-mono text-muted mx-0.5">V</kbd> 粘贴，或点下方 <kbd className="inline-block rounded bg-[var(--bg-3)] px-1.5 py-0.5 text-[10px] num-mono text-muted mx-0.5">+</kbd> 输入 URL
+              </div>
+
+              <div className="mt-5 sm:mt-6 flex justify-center gap-2 text-[11px] flex-wrap">
+                {[
+                  { icon: Music2, label: "音频直进", showMobile: true },
+                  { icon: Video, label: "视频抽音", showMobile: true },
+                  { icon: Link2, label: "URL 下载", showMobile: true },
+                  { icon: ClipboardPaste, label: "剪贴板粘贴", showMobile: false },
+                ].map(({ icon: Icon, label, showMobile }) => (
+                  <span
+                    key={label}
+                    className={`inline-flex items-center gap-1.5 rounded-full border border-app bg-[var(--bg-2)] px-3 py-1 text-muted ${showMobile ? "" : "hidden sm:inline-flex"}`}
+                  >
+                    <Icon className="h-3 w-3 text-[var(--accent-cyan)]" />
+                    {label}
+                  </span>
+                ))}
+              </div>
+            </motion.div>
+          )}
+
+          {mode === "extracting" && extracting && (
+            <motion.div
+              key="extracting"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="p-5 sm:p-6"
+            >
+              <div className="flex items-center gap-3 sm:gap-4">
+                <div className="flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-[12px] bg-[var(--bg-2)] shrink-0">
+                  <Loader2 className="h-5 w-5 sm:h-6 sm:w-6 text-[var(--accent-cyan)] animate-spin" strokeWidth={2.4} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="font-display text-[13px] sm:text-[14px] font-medium truncate">{extracting.fileName}</span>
+                    <SourceBadge source={extracting.source} />
+                  </div>
+                  {extracting.sourceHint && (
+                    <div className="mt-0.5 text-[10px] text-dim truncate num-mono">{extracting.sourceHint}</div>
+                  )}
+                  <div className="mt-1.5 text-[11px] text-dim">
+                    {sourceStageText(extracting.source)}
+                  </div>
+                  <div className="mt-2 h-1.5 w-full rounded-full bg-[var(--bg-3)] overflow-hidden">
+                    <motion.div
+                      className="h-full grad-primary"
+                      initial={{ width: 0 }}
+                      animate={{ width: `${extracting.pct}%` }}
+                      transition={{ duration: 0.2 }}
+                    />
+                  </div>
+                  <div className="mt-1 flex justify-between text-[10px] text-dim num-mono">
+                    <span>{extracting.stage}</span>
+                    <span>{extracting.pct}%</span>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {mode === "preview" && file && (
+            <motion.div
+              key="preview"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="p-4 sm:p-5 md:p-6"
+            >
+              <div className="flex items-center justify-between gap-3 sm:gap-4">
+                <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                  <div className="flex h-11 w-11 sm:h-14 sm:w-14 items-center justify-center rounded-[12px] grad-primary shrink-0">
+                    {file.sourceKind === "video" ? (
+                      <Video className="h-5 w-5 sm:h-6 sm:w-6 text-[var(--bg-0)]" strokeWidth={2.4} />
+                    ) : (
+                      <Music2 className="h-5 w-5 sm:h-6 sm:w-6 text-[var(--bg-0)]" strokeWidth={2.4} />
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                      <span className="font-display text-[14px] sm:text-[15px] font-medium truncate max-w-[180px] sm:max-w-none">{file.name}</span>
+                      <SourceBadge source={file.extractionSource} />
+                      {file.sourceKind === "video" && file.extractionSource === "file" && (
+                        <span className="hidden sm:inline-flex shrink-0 items-center gap-1 rounded-full bg-[var(--bg-3)] px-2 py-0.5 text-[10px] text-[var(--accent-cyan)] num-mono">
+                          <Video className="h-2.5 w-2.5" /> 来自 {file.sourceFormat}
+                        </span>
+                      )}
+                    </div>
+                    <div className="mt-0.5 sm:mt-1 flex items-center gap-2 sm:gap-3 text-[10px] sm:text-[11px] text-dim num-mono">
+                      <span>{formatTime(file.duration)}</span>
+                      <span className="hidden sm:inline">·</span>
+                      <span className="hidden sm:inline">{file.format}</span>
+                      {file.size > 0 && (
+                        <>
+                          <span className="hidden sm:inline">·</span>
+                          <span>{(file.size / 1024 / 1024).toFixed(1)} MB</span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    onClick={onReset}
+                    className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-[10px] hover:bg-[var(--bg-2)] text-dim hover:text-muted transition"
+                    title="换一个文件"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={startAnalysis}
+                    className="group relative flex h-10 sm:h-11 items-center gap-1.5 sm:gap-2 rounded-[12px] px-3 sm:px-5 text-[12px] sm:text-[13px] font-semibold text-[var(--bg-0)] grad-primary shadow-card transition hover:scale-[1.02] active:scale-[0.98]"
+                  >
+                    <Zap className="h-3.5 w-3.5 sm:h-4 sm:w-4" strokeWidth={2.4} />
+                    <span className="hidden sm:inline">开始智能分析</span>
+                    <span className="sm:hidden">分析</span>
+                    <ArrowRight className="hidden sm:block h-4 w-4 transition group-hover:translate-x-0.5" />
+                  </button>
+                </div>
+              </div>
+              <div className="mt-3 sm:mt-4 h-16 sm:h-20">
+                <WaveformCanvas
+                  peaks={generatePeaks(200, file.duration)}
+                  duration={file.duration}
+                  height={64}
+                  interactive={false}
+                  showRuler={false}
+                />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
     </motion.div>
   );

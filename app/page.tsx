@@ -385,20 +385,26 @@ function Hero({
           <span className="text-[11px] text-muted">Agent 后端在线 · 7 阶段流水线已就绪</span>
         </motion.div>
         <h1 className="font-display text-[42px] md:text-[52px] font-semibold leading-[1.05] tracking-tight">
-          把一首歌<span className="text-dim">（或一段视频、一个 URL）</span>，
-          <br className="md:hidden" />
+          一首歌，
           <span
             className="bg-clip-text text-transparent"
             style={{ backgroundImage: "linear-gradient(135deg,#00E5FF,#7C5CFF)" }}
           >
-            变成一段丝滑的铃声
+            AI 挑出最炸的那段
+          </span>
+          ，做成
+          <span
+            className="bg-clip-text text-transparent"
+            style={{ backgroundImage: "linear-gradient(135deg,#7C5CFF,#00E5FF)" }}
+          >
+            丝滑铃声
           </span>
           。
         </h1>
         <p className="mx-auto mt-4 max-w-[580px] text-[14px] md:text-[15px] text-muted leading-relaxed">
-          ≤ 29.99s · 自动分析 · 循环丝滑 · AAC 192k · 三种输入方式任选。
+          ≤ 29.99s · 3 个候选 · 循环丝滑 · AAC 192k
           <br className="hidden md:block" />
-          <span className="text-dim">拖拽文件 · 粘贴文件（⌘/Ctrl+V） · 贴 URL</span>
+          <span className="text-dim">拖拽 · 粘贴（⌘/Ctrl+V） · 贴 URL · 视频抽音</span>
         </p>
       </div>
 
@@ -467,7 +473,7 @@ function FloatingInputBar({
   disabled: boolean;
 }) {
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-30 w-[min(680px,calc(100vw-32px))] pointer-events-none">
+    <div className="fixed bottom-[calc(env(safe-area-inset-bottom)+72px)] lg:bottom-6 left-1/2 -translate-x-1/2 z-30 w-[min(680px,calc(100vw-32px))] pointer-events-none">
       <AnimatePresence>
         {urlPanelOpen && (
           <motion.div

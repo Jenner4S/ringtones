@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "RingtoneMaster · v4",
-  description: "专业 iPhone 铃声 Agent —— 深度分析 · 动态候选 · 循环丝滑",
+  description: "AI 挑出最炸的那段 · 丝滑铃声一键出 —— 专业 iPhone 铃声 Agent",
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   authors: [{ name: "RingtoneMaster Team" }],
   openGraph: {
     title: "RingtoneMaster",
-    description: "专业 iPhone 铃声 Agent · 拖入一首歌 · 一键出候选",
+    description: "AI 挑出最炸的那段 · 丝滑铃声一键出",
     type: "website",
   },
 };

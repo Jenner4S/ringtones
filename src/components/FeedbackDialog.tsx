@@ -75,7 +75,7 @@ export function FeedbackDialog({ floating = false }: { floating?: boolean }) {
           whileHover={{ scale: 1.08 }}
           whileTap={{ scale: 0.92 }}
           onClick={() => setOpen(true)}
-          className="fixed bottom-6 right-6 z-40 flex h-12 w-12 items-center justify-center rounded-full grad-primary shadow-lg"
+          className="fixed bottom-[calc(env(safe-area-inset-bottom)+72px)] lg:bottom-6 right-4 sm:right-6 z-40 flex h-12 w-12 items-center justify-center rounded-full grad-primary shadow-lg"
           aria-label="反馈"
         >
           <MessageSquarePlus className="h-5 w-5 text-[var(--bg-0)]" />

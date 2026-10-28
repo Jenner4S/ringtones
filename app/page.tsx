@@ -176,19 +176,24 @@ export default function HomePage() {
       showToast("error", "请先加载音视频文件");
       return;
     }
-    const p = createMockProject();
+    const duration = file?.duration ?? 213;
+    const p = createMockProject(duration);
     if (file) {
       p.name = file.name.replace(/\.[^.]+$/, "");
       p.file.name = file.sourceName;
-      p.file.duration = file.duration;
+      p.file.duration = duration;
       p.file.format = file.format;
       p.file.sourceKind = file.sourceKind;
       p.file.sourceFormat = file.sourceFormat;
       p.file.sourceName = file.sourceName;
     }
     p.file.url = extractedUrlRef.current;
+    p.stage = "qa";
+    p.completedStages = ["decode", "structure", "vocal", "anchor", "candidates", "render", "qa"];
+    p.stages = p.stages.map((s) => ({ ...s, status: "done", progress: 100 }));
+    p.selectedCandidateId = p.candidates[0]?.id;
     setProject(p);
-    showToast("success", "分析完成 · 10 个候选已就绪");
+    showToast("success", `分析完成 · ${p.candidates.length} 个候选已就绪`);
     setTimeout(() => router.push("/workspace/candidates"), 600);
   };
 

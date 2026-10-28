@@ -143,10 +143,18 @@ export function CandidateDetail({
         </div>
       </div>
 
-      <div className="glass rounded-[12px] sm:rounded-[14px] p-3 sm:p-4 hidden sm:block">
-        <div className="text-[11px] text-dim mb-2">评分雷达 · 8 维</div>
+      <div className="glass rounded-[12px] sm:rounded-[14px] p-3 sm:p-4">
+        <div className="text-[11px] text-dim mb-2">
+          <span className="sm:hidden">评分雷达 · 4 维核心</span>
+          <span className="hidden sm:inline">评分雷达 · 8 维</span>
+        </div>
         <div className="flex justify-center">
-          <RadarChart data={candidate.scoreBreakdown} size={220} />
+          <div className="hidden sm:block w-[280px]">
+            <RadarChart data={candidate.scoreBreakdown} size={220} />
+          </div>
+          <div className="sm:hidden w-full max-w-[220px]">
+            <RadarChart data={candidate.scoreBreakdown} size={180} compact />
+          </div>
         </div>
       </div>
 

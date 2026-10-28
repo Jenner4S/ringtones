@@ -8,9 +8,10 @@ interface RadarChartProps {
   labels?: string[];
   size?: number;
   className?: string;
+  compact?: boolean;
 }
 
-const AXIS_LABELS = [
+const AXIS_LABELS_FULL = [
   ["integrity", "完整性"],
   ["recognizability", "识别度"],
   ["opening", "开头"],
@@ -21,13 +22,21 @@ const AXIS_LABELS = [
   ["technical", "技术"],
 ] as const;
 
-export function RadarChart({ data, labels, size = 220, className }: RadarChartProps) {
+const AXIS_LABELS_COMPACT = [
+  ["integrity", "完整"],
+  ["recognizability", "识别"],
+  ["loop", "循环"],
+  ["energy", "能量"],
+] as const;
+
+export function RadarChart({ data, labels, size = 220, className, compact = false }: RadarChartProps) {
+  const axes = (compact ? AXIS_LABELS_COMPACT : AXIS_LABELS_FULL).map(([k, l]) => ({ key: k, label: l }));
+  const n = axes.length;
+  const levels = 4;
+
   const cx = size / 2;
   const cy = size / 2;
   const radius = size * 0.38;
-  const axes = AXIS_LABELS.map(([k, l]) => ({ key: k, label: l }));
-  const n = axes.length;
-  const levels = 4;
 
   const angle = (i: number) => (Math.PI * 2 * i) / n - Math.PI / 2;
 
@@ -40,9 +49,12 @@ export function RadarChart({ data, labels, size = 220, className }: RadarChartPr
   const dataPoints = axes.map((ax, i) => point(i, Math.min(100, Math.max(0, data[ax.key] ?? 0))));
   const pathD = dataPoints.map((p, i) => (i === 0 ? `M${p[0]},${p[1]}` : `L${p[0]},${p[1]}`)).join(" ") + "Z";
 
+  const labelOffset = compact ? 20 : 18;
+  const fontSize = compact ? 11 : 10.5;
+
   return (
-    <div className={cn("relative", className)} style={{ width: size, height: size }}>
-      <svg width={size} height={size} className="overflow-visible">
+    <div className={cn("relative w-full max-w-full aspect-square", className)}>
+      <svg viewBox={`0 0 ${size} ${size}`} className="w-full h-full overflow-visible">
         {Array.from({ length: levels }, (_, li) => {
           const r = (radius * (li + 1)) / levels;
           const pts = axes.map((_, i) => {
@@ -95,8 +107,8 @@ export function RadarChart({ data, labels, size = 220, className }: RadarChartPr
         </defs>
         {axes.map((ax, i) => {
           const a = angle(i);
-          const lx = cx + Math.cos(a) * (radius + 18);
-          const ly = cy + Math.sin(a) * (radius + 18);
+          const lx = cx + Math.cos(a) * (radius + labelOffset);
+          const ly = cy + Math.sin(a) * (radius + labelOffset);
           const v = Math.round(Math.min(100, Math.max(0, data[ax.key] ?? 0)));
           return (
             <g key={ax.key}>
@@ -107,9 +119,19 @@ export function RadarChart({ data, labels, size = 220, className }: RadarChartPr
                 dominantBaseline="middle"
                 className="num-mono"
                 fill="var(--text-2)"
-                fontSize={10.5}
+                fontSize={fontSize}
               >
                 {v}
+              </text>
+              <text
+                x={lx}
+                y={ly + (compact ? 11 : 10)}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                className="fill-muted"
+                fontSize={compact ? 9 : 8.5}
+              >
+                {ax.label}
               </text>
             </g>
           );

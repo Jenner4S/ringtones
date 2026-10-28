@@ -527,16 +527,18 @@ function DetailPanel({
         </ul>
       </div>
 
-      <div className="grid grid-cols-3 gap-2 pt-1">
+      <div className="sticky bottom-0 z-20 -mx-3 sm:-mx-4 mt-3 sm:mt-4 border-t border-app bg-[var(--bg-0)]/85 backdrop-blur-xl px-3 sm:px-4 py-2.5 sm:py-3 pb-[calc(env(safe-area-inset-bottom)+10px)]">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
         <button
           onClick={() => {
             selectCandidate(candidate.id);
             router.push("/workspace/editor");
           }}
-          className="flex items-center justify-center gap-1 rounded-[10px] glass py-2 text-[12px] text-muted hover:text-1 hover:bg-[var(--bg-3)] transition"
+          className="flex items-center justify-center gap-1 rounded-[10px] glass py-2.5 text-[12px] text-muted hover:text-1 hover:bg-[var(--bg-3)] transition min-h-[44px]"
         >
           <SkipForward className="h-3.5 w-3.5" />
-          精修
+          <span className="hidden sm:inline">精修</span>
+          <span className="sm:hidden">编辑</span>
         </button>
         <button
           onClick={() => {
@@ -548,7 +550,7 @@ function DetailPanel({
             updateCandidate(candidate.id, { scoreBreakdown: bd, score: newScore });
             showToast("success", `重新评分完成 · ${newScore} 分`);
           }}
-          className="flex items-center justify-center gap-1 rounded-[10px] glass py-2 text-[12px] text-muted hover:text-1 hover:bg-[var(--bg-3)] transition"
+          className="hidden sm:flex items-center justify-center gap-1 rounded-[10px] glass py-2 text-[12px] text-muted hover:text-1 hover:bg-[var(--bg-3)] transition"
         >
           重新评分
         </button>
@@ -557,11 +559,12 @@ function DetailPanel({
             toggleExport(candidate.id);
             router.push("/workspace/export");
           }}
-          className="flex items-center justify-center gap-1 rounded-[10px] grad-primary py-2 text-[12px] font-medium text-[var(--bg-0)] transition hover:scale-[1.02]"
+          className="flex items-center justify-center gap-1 rounded-[10px] grad-primary py-2.5 text-[12px] font-medium text-[var(--bg-0)] transition hover:scale-[1.02] min-h-[44px]"
         >
           <Download className="h-3.5 w-3.5" />
           导出此条
         </button>
+        </div>
       </div>
     </div>
   );

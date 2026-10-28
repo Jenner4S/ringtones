@@ -92,7 +92,7 @@ function TopBar() {
             <ChevronRight className="h-3.5 w-3.5 text-dim" />
             <div className="flex items-center gap-2 rounded-full glass px-3 py-1">
               <div className="h-1.5 w-1.5 rounded-full bg-[var(--accent-green)]" />
-              <div className="text-[12px] text-muted truncate max-w-[220px]">{project.name}</div>
+              <div className="text-[12px] text-muted truncate max-w-[100px] sm:max-w-[160px] md:max-w-[220px]">{project.name}</div>
             </div>
           </>
         )}

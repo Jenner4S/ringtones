@@ -130,7 +130,7 @@ export default function CandidatesPage() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-2 sm:gap-2.5">
+        <div className="flex flex-col gap-1.5 sm:gap-2 lg:gap-3">
           <AnimatePresence initial={false}>
             {filtered.map((c, i) => {
               const selected = c.id === selectedId;
@@ -144,29 +144,30 @@ export default function CandidatesPage() {
                   transition={{ delay: i * 0.025 }}
                   onClick={() => selectCandidate(c.id)}
                   className={cn(
-                    "group relative flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 rounded-[14px] p-2.5 sm:p-3 cursor-pointer transition-all glass",
+                    "group relative flex flex-col sm:flex-row items-start sm:items-center gap-1.5 sm:gap-2.5 lg:gap-3 rounded-[12px] sm:rounded-[14px] p-2 sm:p-2.5 lg:p-3 cursor-pointer transition-all glass",
                     selected && "shadow-card",
                     selected && "border-[rgba(0,229,255,0.35)]"
                   )}
                   style={selected ? { boxShadow: "0 0 0 1px rgba(0,229,255,0.2), var(--shadow-card)" } : undefined}
                 >
                   {selected && (
-                    <div className="absolute left-0 top-2.5 bottom-2.5 w-[2px] sm:top-2 sm:bottom-2 rounded-full bg-[var(--accent-cyan)]" />
+                    <div className="absolute left-0 top-2 bottom-2 w-[2px] sm:top-1.5 sm:bottom-1.5 rounded-full bg-[var(--accent-cyan)]" />
                   )}
 
-                  <div className="flex items-center gap-2 sm:gap-0 shrink-0">
-                    <ScoreRing score={c.score} size={32} stroke={2.5} showLabel className="sm:hidden" />
-                    <ScoreRing score={c.score} size={40} stroke={3} showLabel className="hidden md:hidden sm:flex" />
-                    <ScoreRing score={c.score} size={44} stroke={3.5} showLabel className="hidden md:flex" />
+                  <div className="flex items-center shrink-0">
+                    <ScoreRing score={c.score} size={28} stroke={2.2} showLabel className="sm:hidden" />
+                    <ScoreRing score={c.score} size={36} stroke={2.8} showLabel className="hidden sm:flex md:hidden" />
+                    <ScoreRing score={c.score} size={40} stroke={3} showLabel className="hidden md:flex lg:hidden" />
+                    <ScoreRing score={c.score} size={44} stroke={3.5} showLabel className="hidden lg:flex" />
                   </div>
 
-                  <div className="min-w-0 flex-1 flex flex-col gap-1 sm:gap-1.5">
-                    <div className="flex items-center gap-1.5 flex-wrap min-w-0">
-                      <span className="num-mono text-[10px] sm:text-[11px] text-dim shrink-0">#{String(c.index).padStart(2, "0")}</span>
-                      <span className="font-display text-[13px] sm:text-[14px] font-medium truncate">{c.segment} 片段</span>
-                      <Badge variant={c.relaxed ? "amber" : "cyan"} dot className="hidden sm:inline-flex">{c.relaxed ? "放宽" : "AUTO"}</Badge>
+                  <div className="min-w-0 flex-1 flex flex-col gap-1 sm:gap-1.5 w-full sm:w-auto">
+                    <div className="flex items-center gap-1 sm:gap-1.5 flex-nowrap sm:flex-wrap min-w-0">
+                      <span className="num-mono text-[9.5px] sm:text-[11px] text-dim shrink-0">#{String(c.index).padStart(2, "0")}</span>
+                      <span className="font-display text-[12px] sm:text-[14px] font-medium truncate min-w-0">{c.segment} 片段</span>
+                      <Badge variant={c.relaxed ? "amber" : "cyan"} dot className="hidden sm:inline-flex max-[420px]:hidden">{c.relaxed ? "放宽" : "AUTO"}</Badge>
                       <Badge variant="muted" className="hidden md:inline-flex">{c.loopStrategy}</Badge>
-                      <QABadge qa={c.qa} />
+                      <QABadge qa={c.qa} className="hidden sm:inline-flex" />
                     </div>
 
                     <div className="hidden sm:flex items-center gap-2 sm:gap-3 text-[11px] num-mono">
@@ -175,20 +176,21 @@ export default function CandidatesPage() {
                       <span className="text-1 hidden md:inline">{formatDuration(c.duration)}</span>
                       <span className="text-dim hidden lg:inline">·</span>
                       <span className="text-muted hidden lg:inline">锚点 {c.anchorType}</span>
-                      <span className="text-dim hidden lg:inline">·</span>
-                      <span className="text-muted hidden lg:inline">{(c.anchorConfidence * 100).toFixed(0)}%</span>
+                      <span className="text-dim hidden xl:inline">·</span>
+                      <span className="text-muted hidden xl:inline">{(c.anchorConfidence * 100).toFixed(0)}%</span>
                     </div>
 
-                    <div className="flex items-center gap-1.5 text-[10px] num-mono sm:hidden">
+                    <div className="flex items-center gap-1 text-[9.5px] num-mono sm:hidden">
                       <span className="text-muted">{formatTime(c.start)}→{formatTime(c.end)}</span>
+                      <span className="text-dim">·</span>
                       <span className="text-1">{formatDuration(c.duration)}</span>
                     </div>
 
-                    <div className="flex items-center gap-1.5 flex-wrap">
+                    <div className="flex items-center gap-1 sm:gap-1.5 flex-wrap">
                       {[
-                        { k: "off", label: "原始", cls: "" },
-                        { k: "vocal", label: "人声聚焦", cls: "" },
-                        { k: "instrumental", label: "伴奏纯净", cls: "" },
+                        { k: "off", label: "原始" },
+                        { k: "vocal", label: "人声聚焦" },
+                        { k: "instrumental", label: "伴奏纯净" },
                       ].map((m) => (
                         <button
                           key={m.k}
@@ -200,7 +202,7 @@ export default function CandidatesPage() {
                           }}
                           title={m.k === "off" ? "保留全频段" : m.k === "vocal" ? "提取纯净人声" : "去除人声"}
                           className={cn(
-                            "rounded-[7px] px-2 py-1 text-[10px] sm:text-[11px] transition num-mono",
+                            "rounded-[6px] sm:rounded-[7px] px-1.5 sm:px-2 py-0.5 sm:py-1 text-[9.5px] sm:text-[11px] transition num-mono",
                             vm === m.k
                               ? "bg-[rgba(0,229,255,0.14)] text-[var(--accent-cyan)] ring-1 ring-[rgba(0,229,255,0.35)]"
                               : "text-muted hover:text-1 hover:bg-[var(--bg-3)]"
@@ -210,16 +212,16 @@ export default function CandidatesPage() {
                         </button>
                       ))}
                       {vm !== "off" && (
-                        <span className="text-[10px] num-mono text-[var(--accent-cyan)] hidden sm:inline">· 声像处理中</span>
+                        <span className="text-[9.5px] sm:text-[10px] num-mono text-[var(--accent-cyan)] hidden sm:inline">· 声像处理中</span>
                       )}
                     </div>
 
                     {selected && (
-                      <div className="mt-1 h-10 opacity-70 sm:opacity-0 sm:group-hover:opacity-100 transition">
+                      <div className="mt-0.5 sm:mt-1 h-8 sm:h-10 opacity-80 sm:opacity-0 sm:group-hover:opacity-100 transition">
                         <WaveformCanvas
                           peaks={project.analysis?.waveformPeaks ?? []}
                           duration={project.analysis?.duration ?? 0}
-                          height={40}
+                          height={32}
                           interactive={false}
                           showRuler={false}
                           selectedStart={c.start}
@@ -229,16 +231,16 @@ export default function CandidatesPage() {
                     )}
                   </div>
 
-                  <div className="flex items-center gap-1 shrink-0">
+                  <div className="flex items-center gap-1 shrink-0 mt-0.5 sm:mt-0">
                     <button
                       onClick={(e) => { e.stopPropagation(); playCandidate(c); }}
-                      className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full glass hover:scale-105 active:scale-95 transition"
+                      className="flex h-7 w-7 sm:h-8 sm:w-8 lg:h-9 lg:w-9 items-center justify-center rounded-full glass hover:scale-105 active:scale-95 transition"
                       aria-label="播放"
                     >
                       {playingId === c.id ? (
-                        <Pause className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-[var(--accent-cyan)]" />
+                        <Pause className="h-3 w-3 sm:h-3.5 sm:w-3.5 lg:h-4 lg:w-4 text-[var(--accent-cyan)]" />
                       ) : (
-                        <Play className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-[var(--accent-cyan)]" />
+                        <Play className="h-3 w-3 sm:h-3.5 sm:w-3.5 lg:h-4 lg:w-4 text-[var(--accent-cyan)]" />
                       )}
                     </button>
                     <button
@@ -249,21 +251,21 @@ export default function CandidatesPage() {
                       }}
                       aria-label="加入导出"
                       className={cn(
-                        "flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full glass hover:scale-105 active:scale-95 transition",
+                        "flex h-7 w-7 sm:h-8 sm:w-8 lg:h-9 lg:w-9 items-center justify-center rounded-full glass hover:scale-105 active:scale-95 transition",
                         inExport.includes(c.id) && "bg-[rgba(46,230,168,0.18)]"
                       )}
                     >
-                      <Check className={cn("h-3.5 w-3.5 sm:h-4 sm:w-4", inExport.includes(c.id) && "text-[var(--accent-green)]")} />
+                      <Check className={cn("h-3 w-3 sm:h-3.5 sm:w-3.5 lg:h-4 lg:w-4", inExport.includes(c.id) && "text-[var(--accent-green)]")} />
                     </button>
                     <button
                       onClick={(e) => { e.stopPropagation(); toggleFav(c.id); }}
                       aria-label="收藏"
                       className={cn(
-                        "flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full glass hover:scale-105 active:scale-95 transition",
+                        "flex h-7 w-7 sm:h-8 sm:w-8 lg:h-9 lg:w-9 items-center justify-center rounded-full glass hover:scale-105 active:scale-95 transition",
                         favorites.includes(c.id) && "bg-[rgba(255,176,32,0.18)]"
                       )}
                     >
-                      <Flag className={cn("h-3.5 w-3.5 sm:h-4 sm:w-4", favorites.includes(c.id) && "text-[var(--accent-amber)]")} />
+                      <Flag className={cn("h-3 w-3 sm:h-3.5 sm:w-3.5 lg:h-4 lg:w-4", favorites.includes(c.id) && "text-[var(--accent-amber)]")} />
                     </button>
                     <button
                       onClick={(e) => {
@@ -272,9 +274,9 @@ export default function CandidatesPage() {
                         router.push("/workspace/editor");
                       }}
                       aria-label="更多"
-                      className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full glass opacity-60 sm:opacity-0 sm:group-hover:opacity-100 hover:opacity-100 hover:scale-105 transition"
+                      className="flex h-7 w-7 sm:h-8 sm:w-8 lg:h-9 lg:w-9 items-center justify-center rounded-full glass opacity-60 sm:opacity-0 sm:group-hover:opacity-100 hover:opacity-100 hover:scale-105 transition"
                     >
-                      <MoreHorizontal className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted" />
+                      <MoreHorizontal className="h-3 w-3 sm:h-3.5 sm:w-3.5 lg:h-4 lg:w-4 text-muted" />
                     </button>
                   </div>
                 </motion.div>

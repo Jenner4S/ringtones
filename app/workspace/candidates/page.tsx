@@ -112,9 +112,9 @@ export default function CandidatesPage() {
           allCount={project.candidates.length}
         />
 
-        <div className="glass rounded-[14px] p-3">
-          <div className="mb-1 text-[11px] text-dim">全曲波形 · 选中区间预览</div>
-          <div className="h-[110px]">
+        <div className="glass rounded-[10px] sm:rounded-[14px] p-2 sm:p-3">
+          <div className="mb-1 text-[10px] sm:text-[11px] text-dim">全曲波形 · 选中区间预览</div>
+          <div className="h-[70px] sm:h-[110px]">
             <WaveformCanvas
               peaks={project.analysis?.waveformPeaks ?? []}
               duration={project.analysis?.duration ?? 0}
@@ -365,32 +365,33 @@ function Toolbar({
   const bulkToggleExport = useStore((s) => s.bulkToggleExport);
   const regenerateCandidates = useStore((s) => s.regenerateCandidates);
   return (
-    <div className="glass rounded-[14px] flex flex-wrap items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2">
-      <div className="flex items-center gap-0.5 sm:gap-1">
-        <Filter className="h-3.5 w-3.5 text-muted mx-1 sm:mx-2" />
+    <div className="glass rounded-[10px] sm:rounded-[14px] flex flex-wrap items-center gap-0.5 sm:gap-1.5 p-1 sm:p-2">
+      <div className="flex items-center gap-0.5">
+        <Filter className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-muted mx-0.5 sm:mx-2 shrink-0" />
         {[
-          { k: "all", label: `全部 ${allCount}` },
-          { k: "pass", label: `PASS ${passCount}` },
-          { k: "relaxed", label: "放宽" },
-          { k: "fail", label: "FAIL" },
+          { k: "all", labelAll: `全部 ${allCount}`, labelMobile: `${allCount}` },
+          { k: "pass", labelAll: `PASS ${passCount}`, labelMobile: `${passCount}` },
+          { k: "relaxed", labelAll: "放宽", labelMobile: "宽" },
+          { k: "fail", labelAll: "FAIL", labelMobile: "失" },
         ].map((f) => (
           <button
             key={f.k}
             onClick={() => setFilter(f.k)}
             className={cn(
-              "rounded-[8px] px-2 sm:px-3 py-1 text-[11px] sm:text-[12px] transition",
+              "rounded-[6px] sm:rounded-[8px] px-1.5 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-[12px] transition whitespace-nowrap",
               filter === f.k ? "bg-[rgba(0,229,255,0.14)] text-[var(--accent-cyan)]" : "text-muted hover:text-1 hover:bg-[var(--bg-3)]"
             )}
           >
-            {f.label}
+            <span className="sm:hidden">{f.labelMobile}</span>
+            <span className="hidden sm:inline">{f.labelAll}</span>
           </button>
         ))}
       </div>
 
-      <div className="mx-1 h-4 w-px bg-[var(--border)] hidden sm:block" />
+      <div className="hidden sm:block mx-1 h-4 w-px bg-[var(--border)]" />
 
-      <div className="flex items-center gap-0.5 sm:gap-1">
-        <ArrowUpDown className="h-3.5 w-3.5 text-muted mx-1 sm:mx-2" />
+      <div className="flex items-center gap-0.5">
+        <ArrowUpDown className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-muted mx-0.5 sm:mx-2 shrink-0" />
         {[
           { k: "score", label: "评分" },
           { k: "duration", label: "时长" },
@@ -400,7 +401,7 @@ function Toolbar({
             key={s.k}
             onClick={() => setSortBy(s.k)}
             className={cn(
-              "rounded-[8px] px-2 sm:px-3 py-1 text-[11px] sm:text-[12px] transition",
+              "rounded-[6px] sm:rounded-[8px] px-1.5 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-[12px] transition whitespace-nowrap",
               sortBy === s.k ? "bg-[var(--bg-3)] text-1" : "text-muted hover:text-1 hover:bg-[var(--bg-3)]"
             )}
           >
@@ -409,16 +410,16 @@ function Toolbar({
         ))}
       </div>
 
-      <div className="mx-1 h-4 w-px bg-[var(--border)] hidden sm:block" />
+      <div className="hidden sm:block mx-1 h-4 w-px bg-[var(--border)]" />
 
-      <div className="flex ml-auto items-center gap-1">
+      <div className="flex ml-auto items-center gap-0.5 sm:gap-1">
         <button
           onClick={() => setViewMode(viewMode === "list" ? "timeline" : "list")}
-          className="rounded-[8px] px-2 sm:px-3 py-1 text-[11px] sm:text-[12px] text-muted hover:text-1 hover:bg-[var(--bg-3)] transition"
+          className="rounded-[6px] sm:rounded-[8px] px-1.5 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-[12px] text-muted hover:text-1 hover:bg-[var(--bg-3)] transition"
           title="切换视图"
         >
-          {viewMode === "list" ? <List className="inline h-3.5 w-3.5 -mt-0.5" /> : <Columns className="inline h-3.5 w-3.5 -mt-0.5" />}
-          <span className="ml-1 hidden sm:inline">视图</span>
+          {viewMode === "list" ? <List className="inline h-3 w-3 sm:h-3.5 sm:w-3.5 -mt-0.5" /> : <Columns className="inline h-3 w-3 sm:h-3.5 sm:w-3.5 -mt-0.5" />}
+          <span className="ml-0.5 hidden sm:inline">视图</span>
         </button>
 
         <button
@@ -426,9 +427,10 @@ function Toolbar({
             regenerateCandidates();
             showToast("success", "已生成 3 个新候选");
           }}
-          className="flex items-center gap-1 rounded-[8px] px-2 sm:px-3 py-1 text-[11px] sm:text-[12px] text-muted hover:text-1 hover:bg-[var(--bg-3)] transition"
+          className="flex items-center gap-1 rounded-[6px] sm:rounded-[8px] px-1.5 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-[12px] text-muted hover:text-1 hover:bg-[var(--bg-3)] transition"
+          title="再挖一些"
         >
-          <Plus className="h-3.5 w-3.5" />
+          <Plus className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
           <span className="hidden sm:inline">再挖一些</span>
         </button>
 
@@ -442,9 +444,10 @@ function Toolbar({
             bulkToggleExport(passIds);
             showToast("success", `${passIds.length} 条 PASS 已加入导出队列`);
           }}
-          className="flex items-center gap-1 rounded-[10px] grad-primary px-2.5 sm:px-3 py-1 sm:py-1.5 text-[11px] sm:text-[12px] font-medium text-[var(--bg-0)] transition hover:scale-[1.02]"
+          className="flex items-center gap-1 rounded-[6px] sm:rounded-[10px] grad-primary px-1.5 sm:px-3 py-0.5 sm:py-1.5 text-[10px] sm:text-[12px] font-medium text-[var(--bg-0)] transition hover:scale-[1.02]"
+          title="批量导出 PASS"
         >
-          <Download className="h-3.5 w-3.5" />
+          <Download className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
           <span className="hidden sm:inline">批量导出</span>
           <span className="hidden md:inline"> PASS</span>
         </button>

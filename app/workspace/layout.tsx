@@ -43,35 +43,36 @@ export default function WorkspaceLayout({ children }: { children: React.ReactNod
   return (
     <AppShell>
       <Toast />
-      <div className="mb-4 lg:mb-6 flex flex-col gap-3 lg:gap-4">
-        <div className="flex items-center justify-between gap-2 sm:gap-3 flex-wrap">
-          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-            <div className="min-w-0">
-              <h1 className="font-display text-[18px] sm:text-[22px] font-semibold leading-tight truncate">{project.name}</h1>
-              <div className="mt-1 text-[12px] text-dim num-mono">
-                {project.analysis?.bpm} BPM · {project.file.duration.toFixed(1)}s · {project.candidates.length} 候选
-              </div>
+      <div className="mb-3 lg:mb-6 flex flex-col gap-2 lg:gap-4">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+              <h1 className="font-display text-[15px] sm:text-[22px] font-semibold leading-tight truncate min-w-0 flex-1">{project.name}</h1>
+              <button
+                onClick={onDelete}
+                className="flex-shrink-0 h-6 w-6 sm:h-7 sm:w-7 flex items-center justify-center rounded-md text-dim hover:text-[var(--accent-red)] hover:bg-[var(--accent-red)]/10 transition"
+                title="删除此项目"
+              >
+                <Trash2 className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+              </button>
             </div>
-            <button
-              onClick={onDelete}
-              className="flex-shrink-0 h-7 w-7 flex items-center justify-center rounded-md text-dim hover:text-[var(--accent-red)] hover:bg-[var(--accent-red)]/10 transition"
-              title="删除此项目"
-            >
-              <Trash2 className="h-3.5 w-3.5" />
-            </button>
+            <div className="mt-0.5 text-[10px] sm:text-[12px] text-dim num-mono truncate">
+              {project.analysis?.bpm}BPM·{project.file.duration.toFixed(0)}s·{project.candidates.length}♪
+            </div>
           </div>
-          <nav className="flex items-center gap-1 glass rounded-[12px] p-1">
+          <nav className="flex items-center gap-0.5 sm:gap-1 glass rounded-[10px] sm:rounded-[12px] p-0.5 sm:p-1">
             {STAGES.map((s, i) => (
               <Link
                 key={s.key}
                 href={s.href}
+                aria-label={s.label}
                 className={
-                  "flex items-center gap-2 rounded-[10px] px-3 py-1.5 text-[12px] transition " +
+                  "flex items-center gap-1 sm:gap-2 rounded-[8px] sm:rounded-[10px] px-1.5 sm:px-3 py-1 text-[11px] sm:text-[12px] transition " +
                   "hover:text-1 hover:bg-[var(--bg-3)] text-muted"
                 }
               >
                 <s.icon className="h-3.5 w-3.5" />
-                {s.label}
+                <span className="hidden sm:inline">{s.label}</span>
               </Link>
             ))}
           </nav>

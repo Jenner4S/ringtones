@@ -379,12 +379,24 @@ function Hero({
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="mb-3 inline-flex items-center gap-2 rounded-full glass px-3 py-1"
+          className="mb-3 hidden sm:inline-flex items-center gap-2 rounded-full glass px-3 py-1"
         >
           <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent-cyan)] animate-pulse" />
           <span className="text-[11px] text-muted">Agent 后端在线 · 7 阶段流水线已就绪</span>
         </motion.div>
-        <h1 className="font-display text-[42px] md:text-[52px] font-semibold leading-[1.05] tracking-tight">
+
+        <h1 className="sm:hidden font-display text-[32px] font-semibold leading-[1.15] tracking-tight">
+          一首歌，
+          <span
+            className="bg-clip-text text-transparent"
+            style={{ backgroundImage: "linear-gradient(135deg,#00E5FF,#7C5CFF)" }}
+          >
+            AI 挑出最炸那段，
+          </span>
+          丝滑铃声
+        </h1>
+
+        <h1 className="hidden sm:block font-display text-[42px] md:text-[52px] font-semibold leading-[1.05] tracking-tight">
           一首歌，
           <span
             className="bg-clip-text text-transparent"
@@ -401,10 +413,12 @@ function Hero({
           </span>
           。
         </h1>
-        <p className="mx-auto mt-4 max-w-[580px] text-[14px] md:text-[15px] text-muted leading-relaxed">
-          ≤ 29.99s · 3 个候选 · 循环丝滑 · AAC 192k
+
+        <p className="mx-auto mt-4 max-w-[580px] text-[13px] sm:text-[14px] md:text-[15px] text-muted leading-relaxed">
+          <span className="sm:hidden">≤ 30s · 一键出候选</span>
+          <span className="hidden sm:inline">≤ 29.99s · 3 个候选 · 循环丝滑 · AAC 192k</span>
           <br className="hidden md:block" />
-          <span className="text-dim">拖拽 · 粘贴（⌘/Ctrl+V） · 贴 URL · 视频抽音</span>
+          <span className="hidden md:inline text-dim">拖拽 · 粘贴（⌘/Ctrl+V） · 贴 URL · 视频抽音</span>
         </p>
       </div>
 
@@ -438,18 +452,21 @@ function Hero({
         <div className="font-display text-[18px] md:text-[20px] font-semibold">
           把音频 / 视频拖到这里，或点击选择
         </div>
-        <div className="mt-2 text-[12px] text-dim">
+        <div className="mt-2 text-[12px] text-dim hidden sm:block">
           也可以按 <kbd className="inline-block rounded bg-[var(--bg-3)] px-1.5 py-0.5 text-[10px] num-mono text-muted mx-0.5">⌘</kbd>+<kbd className="inline-block rounded bg-[var(--bg-3)] px-1.5 py-0.5 text-[10px] num-mono text-muted mx-0.5">V</kbd> 粘贴，或点下方 <kbd className="inline-block rounded bg-[var(--bg-3)] px-1.5 py-0.5 text-[10px] num-mono text-muted mx-0.5">+</kbd> 输入 URL
         </div>
 
         <div className="mt-6 flex justify-center gap-2 text-[11px] flex-wrap">
           {[
-            { icon: Music2, label: "音频直进" },
-            { icon: Video, label: "视频抽音" },
-            { icon: Link2, label: "URL 下载" },
-            { icon: ClipboardPaste, label: "剪贴板粘贴" },
-          ].map(({ icon: Icon, label }) => (
-            <span key={label} className="inline-flex items-center gap-1.5 rounded-full border border-app bg-[var(--bg-2)] px-3 py-1 text-muted">
+            { icon: Music2, label: "音频直进", showMobile: true },
+            { icon: Video, label: "视频抽音", showMobile: true },
+            { icon: Link2, label: "URL 下载", showMobile: true },
+            { icon: ClipboardPaste, label: "剪贴板粘贴", showMobile: false },
+          ].map(({ icon: Icon, label, showMobile }) => (
+            <span
+              key={label}
+              className={`inline-flex items-center gap-1.5 rounded-full border border-app bg-[var(--bg-2)] px-3 py-1 text-muted ${showMobile ? "" : "hidden sm:inline-flex"}`}
+            >
               <Icon className="h-3 w-3 text-[var(--accent-cyan)]" />
               {label}
             </span>
